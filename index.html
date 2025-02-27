@@ -1,25 +1,176 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>DONGPT</title>
-  <style>
-    body { background: #000; color: #00ff00; text-align: center; font-family: monospace; }
-    button { background: #00ff00; color: #fff; border: none; padding: 10px 20px; cursor: pointer; }
-    button:hover { background: #00cc00; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dongpt - Welcome to the Digital Frontier</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: #00FF00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .matrix-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background: url('https://via.placeholder.com/100?text=Matrix+Pattern') repeat; /* 실제 매트릭스 패턴 이미지로 교체 필요 */
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #00FF00;
+        }
+        .tagline {
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+        .navigation {
+            margin-top: 40px;
+        }
+        .nav-link {
+            color: #00FF00;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 5px #00FF00;
+        }
+        .connect-wallet {
+            margin-top: 20px;
+        }
+        #connectButton {
+            background-color: #000;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        #connectButton:hover {
+            background-color: #00FF00;
+            color: #000;
+            box-shadow: 0 0 15px #00FF00;
+        }
+    </style>
 </head>
 <body>
-  <h1>DONGPT</h1>
-  <p>A Digital Corporation Product</p>
-  <nav>
-    <a href="#" style="color: #00ff00;">Home</a> |
-    <a href="#" style="color: #00ff00;">About</a> |
-    <a href="#" style="color: #00ff00;">Docs</a> |
-    <a href="#" style="color: #00ff00;">Plugins</a>
-  </nav>
-  <button id="connectPeraWallet">Connect Pera Wallet</button>
-  <script src="https://cdn.jsdelivr.net/npm/@perawallet/connect/dist/index.min.js"></script>
-  <script src="your-script.js"></script>
+    <div class="matrix-background"></div>
+    <div class="container">
+        <div class="logo">DONGPT</div>
+        <div class="tagline">A Digital Corporation Product</div>
+        <div class="navigation">
+            <a href="#home" class="nav-link">Home</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#docs" class="nav-link">Docs</a>
+            <a href="#plugins" class="nav-link">Plugins</a>
+        </div>
+        <div class="connect-wallet">
+            <button id="connectButton">Connect Pera Wallet</button>
+        </div>
+    </div>
+
+    <!-- 매트릭스 효과 스크립트 -->
+    <script>
+        function createMatrixEffect() {
+            const matrix = document.createElement('canvas');
+            matrix.width = window.innerWidth;
+            matrix.height = window.innerHeight;
+            document.body.appendChild(matrix);
+            const ctx = matrix.getContext('2d');
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
+            ctx.fillRect(0, 0, matrix.width, matrix.height);
+
+            class Symbol {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.value = String.fromCharCode(65 + Math.random() * 57);
+                    this.speed = 1 + Math.random() * 5;
+                }
+                draw() {
+                    ctx.fillStyle = '#00FF00';
+                    ctx.fillText(this.value, this.x, this.y);
+                    this.y += this.speed;
+                    if (this.y > matrix.height) {
+                        this.y = -20;
+                        this.x = Math.random() * matrix.width;
+                    }
+                }
+            }
+
+            const symbols = [];
+            for (let i = 0; i < 100; i++) {
+                symbols.push(new Symbol(Math.random() * matrix.width, Math.random() * matrix.height));
+            }
+
+            function animate() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, matrix.width, matrix.height);
+                symbols.forEach(symbol => symbol.draw());
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+        window.onload = createMatrixEffect;
+    </script>
+
+    <!-- Pera Wallet 연결 스크립트 -->
+    <script src="https://cdn.jsdelivr.net/npm/@perawallet/connect@1/dist/browser/PeraWalletConnect.min.js"></script>
+    <script>
+        // Pera Wallet 초기화
+        const peraWallet = new PeraWalletConnect({
+            chainId: 416002, // TestNet (MainNet은 416001 사용)
+            shouldShowSignTxnToast: true,
+        });
+
+        // Pera Wallet 연결
+        document.getElementById('connectButton').addEventListener('click', async () => {
+            try {
+                const accounts = await peraWallet.connect();
+                if (accounts.length > 0) {
+                    alert(`Pera Wallet에 연결되었습니다: ${accounts[0]}`);
+                    localStorage.setItem('walletAddress', accounts[0]);
+                } else {
+                    alert('연결된 계정이 없습니다. 다시 시도하거나 모바일 앱을 사용하세요.');
+                }
+            } catch (error) {
+                console.error('Pera Wallet 연결 오류:', error);
+                alert('Pera Wallet 연결에 실패했습니다. Pera Wallet이 설치되어 있는지 확인하고 다시 시도하세요.');
+            }
+        });
+
+        // Pera Wallet 연결 해제 (선택 사항)
+        window.addEventListener('unload', () => {
+            if (peraWallet) {
+                peraWallet.disconnect();
+            }
+        });
+    </script>
 </body>
 </html>
