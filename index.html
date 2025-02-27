@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dongpt - Welcome to the Digital Frontier</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: #00FF00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+        }
+        .matrix-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: url('data:image/png;base64,iVBORw0KG...') repeat; /* 실제 매트릭스 패턴 이미지 필요 */
+            opacity: 0.1;
+        }
+        .container {
+            position: relative;
+            text-align: center;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #00FF00;
+        }
+        .tagline {
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+        .navigation {
+            margin-top: 40px;
+        }
+        .nav-link {
+            color: #00FF00;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 5px #00FF00;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-background"></div>
+    <div class="container">
+        <div class="logo">DONGPT</div>
+        <div class="tagline">A Digital Corporation Product</div>
+        <div class="navigation">
+            <a href="#home" class="nav-link">Home</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#docs" class="nav-link">Docs</a>
+            <a href="#plugins" class="nav-link">Plugins</a>
+        </div>
+    </div>
+
+    <script>
+        // 간단한 매트릭스 효과를 위한 JavaScript (선택 사항)
+        function createMatrixEffect() {
+            const matrix = document.createElement('canvas');
+            matrix.width = window.innerWidth;
+            matrix.height = window.innerHeight;
+            document.body.appendChild(matrix);
+            const ctx = matrix.getContext('2d');
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
+            ctx.fillRect(0, 0, matrix.width, matrix.height);
+
+            class Symbol {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.value = String.fromCharCode(65 + Math.random() * 57);
+                    this.speed = 1 + Math.random() * 5;
+                }
+                draw() {
+                    ctx.fillStyle = '#00FF00';
+                    ctx.fillText(this.value, this.x, this.y);
+                    this.y += this.speed;
+                    if (this.y > matrix.height) {
+                        this.y = -20;
+                        this.x = Math.random() * matrix.width;
+                    }
+                }
+            }
+
+            const symbols = [];
+            for (let i = 0; i < 100; i++) {
+                symbols.push(new Symbol(Math.random() * matrix.width, Math.random() * matrix.height));
+            }
+
+            function animate() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, matrix.width, matrix.height);
+                symbols.forEach(symbol => symbol.draw());
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+        window.onload = createMatrixEffect;
+    </script>
+</body>
+</html>
