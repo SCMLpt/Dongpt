@@ -1,9 +1,10 @@
-// Add Pera Wallet SDK via CDN with fallback
+// Add Pera Wallet SDK via CDN with fallback and timeout
 const peraScript = document.createElement('script');
 peraScript.src = 'https://cdn.jsdelivr.net/npm/@perawallet/connect@1/dist/browser/PeraConnect.js';
+peraScript.async = true; // Load asynchronously to prevent blocking
 peraScript.onload = () => {
-    initializePeraWallet();
     console.log('Pera Wallet SDK loaded successfully.');
+    initializePeraWallet();
 };
 peraScript.onerror = () => {
     console.error('Failed to load Pera Wallet SDK. Attempting fallback or retry.');
@@ -18,31 +19,44 @@ document.head.appendChild(peraScript);
 let peraWallet;
 
 function initializePeraWallet() {
-    try {
-        peraWallet = new PeraWalletConnect({
-            chainId: 416002, // TestNet (use 416001 for MainNet)
-            shouldShowSignTxnToast: true,
-        });
+    // Wait a moment to ensure the SDK is fully loaded
+    setTimeout(() => {
+        try {
+            if (typeof PeraWalletConnect !== 'undefined') {
+                peraWallet = new PeraWalletConnect({
+                    chainId: 416002, // TestNet (use 416001 for MainNet)
+                    shouldShowSignTxnToast: true,
+                });
 
-        // Attempt to reconnect to any previous session
-        peraWallet.reconnectSession().then((accounts) => {
-            if (accounts.length > 0) {
-                console.log('Reconnected to Pera Wallet with address:', accounts[0]);
-                alert(`Reconnected to Pera Wallet with address: ${accounts[0]}`);
-                localStorage.setItem('walletAddress', accounts[0]);
-                updateButtonState();
+                // Attempt to reconnect to any previous session
+                peraWallet.reconnectSession().then((accounts) => {
+                    if (accounts.length > 0) {
+                        console.log('Reconnected to Pera Wallet with address:', accounts[0]);
+                        alert(`Reconnected to Pera Wallet with address: ${accounts[0]}`);
+                        localStorage.setItem('walletAddress', accounts[0]);
+                        updateButtonState();
+                    }
+                }).catch((error) => {
+                    console.log('No previous session or reconnection failed:', error);
+                });
+            } else {
+                throw new Error('Pera Wallet SDK not loaded or undefined.');
             }
-        }).catch((error) => {
-            console.log('No previous session or reconnection failed:', error);
-        });
-    } catch (error) {
-        console.error('Error initializing Pera Wallet:', error);
-        alert('Error initializing Pera Wallet. Please try again.');
-    }
+        } catch (error) {
+            console.error('Error initializing Pera Wallet:', error);
+            alert('Error initializing Pera Wallet. Please try again or check the console for details.');
+        }
+    }, 1000); // Wait 1 second to ensure the SDK is ready
 }
 
 // Connect Pera Wallet
 document.getElementById('connectButton').addEventListener('click', async () => {
+    if (!peraWallet) {
+        alert('Pera Wallet is not initialized. Please wait and try again.');
+        initializePeraWallet();
+        return;
+    }
+
     try {
         const accounts = await peraWallet.connect();
         if (accounts.length > 0) {
@@ -68,15 +82,17 @@ document.getElementById('connectButton').addEventListener('click', async () => {
 });
 
 function tryMobileConnection() {
+    if (!peraWallet) {
+        alert('Pera Wallet is not initialized. Please wait and try again.');
+        return;
+    }
+
     try {
         peraWallet.connect().then(() => {
             console.log('Mobile connection flow initiated. Please scan the QR code or follow the deep link with Pera Wallet app.');
-            // Pera Wallet should automatically display a QR code or deep link for mobile
         }).catch((error) => {
             console.error('Failed to initiate mobile connection:', error);
             alert('Could not initiate mobile connection. Please open Pera Wallet on your mobile device, scan the QR code, or use the deep link.');
-            // Optional: Manually trigger QR code display if needed (Pera Wallet handles this automatically)
-            peraWallet.qrConnect(); // This might not be directly available—check Pera Wallet docs
         });
     } catch (error) {
         console.error('Error in mobile connection attempt:', error);
@@ -153,3 +169,6 @@ function createMatrixEffect() {
 }
 
 window.onload = createMatrixEffect;
+
+// Fix the matrix background image error (remove or replace the invalid base64 URL)
+document.querySelector('.matrix-background').style.background = 'url("https://via.placeholder.com/100?text=Matrix+Pattern") repeat'; // Replace with a valid image URL or remove if not needed
