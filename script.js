@@ -1,28 +1,44 @@
-// Add Pera Wallet SDK via CDN
+// Add Pera Wallet SDK via CDN with fallback
 const peraScript = document.createElement('script');
 peraScript.src = 'https://cdn.jsdelivr.net/npm/@perawallet/connect@1/dist/browser/PeraConnect.js';
 peraScript.onload = () => {
     initializePeraWallet();
+    console.log('Pera Wallet SDK loaded successfully.');
 };
 peraScript.onerror = () => {
-    console.error('Failed to load Pera Wallet SDK. Please check your internet connection.');
-    alert('Failed to load Pera Wallet SDK. Please refresh the page and try again.');
+    console.error('Failed to load Pera Wallet SDK. Attempting fallback or retry.');
+    alert('Failed to load Pera Wallet SDK. Please check your internet connection and try refreshing the page.');
+    // Fallback: Try loading from another CDN or retry after a delay
+    setTimeout(() => {
+        document.head.appendChild(peraScript.cloneNode(true));
+    }, 2000);
 };
 document.head.appendChild(peraScript);
 
 let peraWallet;
 
 function initializePeraWallet() {
-    peraWallet = new PeraWalletConnect({
-        // Optional: Customize the connection settings
-        chainId: 416002, // TestNet (use 416001 for MainNet)
-        shouldShowSignTxnToast: true,
-    });
+    try {
+        peraWallet = new PeraWalletConnect({
+            chainId: 416002, // TestNet (use 416001 for MainNet)
+            shouldShowSignTxnToast: true,
+        });
 
-    // Handle reconnection (if user has previously connected)
-    peraWallet.reconnectSession().catch((e) => {
-        console.log('No previous session found or reconnection failed:', e);
-    });
+        // Attempt to reconnect to any previous session
+        peraWallet.reconnectSession().then((accounts) => {
+            if (accounts.length > 0) {
+                console.log('Reconnected to Pera Wallet with address:', accounts[0]);
+                alert(`Reconnected to Pera Wallet with address: ${accounts[0]}`);
+                localStorage.setItem('walletAddress', accounts[0]);
+                updateButtonState();
+            }
+        }).catch((error) => {
+            console.log('No previous session or reconnection failed:', error);
+        });
+    } catch (error) {
+        console.error('Error initializing Pera Wallet:', error);
+        alert('Error initializing Pera Wallet. Please try again.');
+    }
 }
 
 // Connect Pera Wallet
@@ -30,34 +46,49 @@ document.getElementById('connectButton').addEventListener('click', async () => {
     try {
         const accounts = await peraWallet.connect();
         if (accounts.length > 0) {
+            console.log('Connected to Pera Wallet with address:', accounts[0]);
             alert(`Connected to Pera Wallet with address: ${accounts[0]}`);
             localStorage.setItem('walletAddress', accounts[0]);
-            // Optionally, update the UI to show the connected address or a disconnect button
-            document.getElementById('connectButton').textContent = 'Disconnect Pera Wallet';
-            document.getElementById('connectButton').onclick = disconnectPeraWallet;
+            updateButtonState();
         } else {
-            alert('No accounts connected. Please try again or use the mobile app.');
+            console.log('No accounts connected. Initiating mobile connection flow.');
+            alert('No accounts connected. Please use the Pera Wallet mobile app to scan the QR code or follow the deep link.');
+            tryMobileConnection();
         }
     } catch (error) {
         console.error('Error connecting to Pera Wallet:', error);
         if (error.message.includes('User rejected') || error.message.includes('cancelled')) {
             alert('Connection cancelled by the user. Please try again.');
         } else {
-            alert('Failed to connect to Pera Wallet. Please ensure Pera Wallet is installed and try again.');
-            // Try to initiate mobile connection flow manually
+            console.log('Attempting mobile connection fallback due to error:', error);
+            alert('Failed to connect to Pera Wallet. Please ensure Pera Wallet is installed and try again, or scan the QR code with the mobile app.');
             tryMobileConnection();
         }
     }
 });
 
 function tryMobileConnection() {
-    peraWallet.connect().then(() => {
-        // Pera Wallet should automatically display a QR code or deep link for mobile connection
-        console.log('Mobile connection flow initiated. Scan the QR code with Pera Wallet app.');
-    }).catch((error) => {
-        console.error('Failed to initiate mobile connection:', error);
-        alert('Could not initiate mobile connection. Please open Pera Wallet on your mobile device and scan the QR code or use the deep link.');
-    });
+    try {
+        peraWallet.connect().then(() => {
+            console.log('Mobile connection flow initiated. Please scan the QR code or follow the deep link with Pera Wallet app.');
+            // Pera Wallet should automatically display a QR code or deep link for mobile
+        }).catch((error) => {
+            console.error('Failed to initiate mobile connection:', error);
+            alert('Could not initiate mobile connection. Please open Pera Wallet on your mobile device, scan the QR code, or use the deep link.');
+            // Optional: Manually trigger QR code display if needed (Pera Wallet handles this automatically)
+            peraWallet.qrConnect(); // This might not be directly available—check Pera Wallet docs
+        });
+    } catch (error) {
+        console.error('Error in mobile connection attempt:', error);
+        alert('Error initiating mobile connection. Please try again or contact support.');
+    }
+}
+
+// Update button state after connection
+function updateButtonState() {
+    const button = document.getElementById('connectButton');
+    button.textContent = 'Disconnect Pera Wallet';
+    button.onclick = disconnectPeraWallet;
 }
 
 // Disconnect Pera Wallet
@@ -65,6 +96,7 @@ function disconnectPeraWallet() {
     if (peraWallet) {
         peraWallet.disconnect();
         localStorage.removeItem('walletAddress');
+        console.log('Disconnected from Pera Wallet.');
         alert('Disconnected from Pera Wallet.');
         document.getElementById('connectButton').textContent = 'Connect Pera Wallet';
         document.getElementById('connectButton').onclick = () => peraWallet.connect();
