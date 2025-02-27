@@ -57,6 +57,24 @@
             text-decoration: underline;
             text-shadow: 0 0 5px #00FF00;
         }
+        .connect-wallet {
+            margin-top: 20px;
+        }
+        #connectButton {
+            background-color: #000;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        #connectButton:hover {
+            background-color: #00FF00;
+            color: #000;
+            box-shadow: 0 0 15px #00FF00;
+        }
     </style>
 </head>
 <body>
@@ -70,10 +88,13 @@
             <a href="#docs" class="nav-link">Docs</a>
             <a href="#plugins" class="nav-link">Plugins</a>
         </div>
+        <div class="connect-wallet">
+            <button id="connectButton">Connect Pera Wallet</button>
+        </div>
     </div>
 
     <script>
-        // 간단한 매트릭스 효과를 위한 JavaScript (선택 사항)
+        // Matrix effect (same as before)
         function createMatrixEffect() {
             const matrix = document.createElement('canvas');
             matrix.width = window.innerWidth;
@@ -114,7 +135,49 @@
             }
             animate();
         }
+
+        // Pera Wallet Integration
+        // Add Pera Wallet SDK via CDN
+        const peraScript = document.createElement('script');
+        peraScript.src = 'https://cdn.jsdelivr.net/npm/@perawallet/connect@1/dist/browser/PeraConnect.js';
+        document.head.appendChild(peraScript);
+
+        // Initialize Pera Wallet
+        let peraWallet;
+        peraScript.onload = () => {
+            peraWallet = new PeraWalletConnect();
+        };
+
+        // Connect Pera Wallet
+        document.getElementById('connectButton').addEventListener('click', async () => {
+            try {
+                const accounts = await peraWallet.connect();
+                if (accounts.length > 0) {
+                    alert(`Connected to Pera Wallet with address: ${accounts[0]}`);
+                    // Store the connected account for later use
+                    localStorage.setItem('walletAddress', accounts[0]);
+                    // You can now use this address for transactions (e.g., swapping Dongpt)
+                } else {
+                    alert('No accounts connected.');
+                }
+            } catch (error) {
+                console.error('Error connecting to Pera Wallet:', error);
+                alert('Failed to connect to Pera Wallet. Please try again.');
+            }
+        });
+
+        // Disconnect Pera Wallet (optional, for cleanup)
+        window.addEventListener('unload', () => {
+            if (peraWallet) {
+                peraWallet.disconnect();
+            }
+        });
+
+        // Initialize matrix effect when the page loads
         window.onload = createMatrixEffect;
     </script>
+
+    <!-- Add Algorand SDK for blockchain interactions -->
+    <script src="https://cdn.jsdelivr.net/npm/algosdk@latest/dist/browser/algosdk.min.js"></script>
 </body>
 </html>
