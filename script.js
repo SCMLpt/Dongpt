@@ -11,8 +11,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portfolioSection = document.getElementById('portfolioSection');
     const buySection = document.getElementById('buySection');
     const founderSection = document.getElementById('founderSection');
+    const statsSection = document.getElementById('statsSection');
+    const statsTitle = document.getElementById('statsTitle');
     const portfolioTableBody = document.querySelector('#portfolioTable tbody');
     const menuLinks = document.querySelectorAll('.menu-link');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
 
     if (!connectButton || !swapButton) {
         console.error('Button not found.');
@@ -24,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let connectedWallet = null;
     let connectedAccount = null;
     let provider = null;
+    let activityChart = null;
 
     // Uniswap V2 Router 정보 (Ethereum MainNet)
     const UNISWAP_ROUTER_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
@@ -67,11 +71,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 portfolioSection.classList.remove('active');
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
+                statsSection.classList.remove('active');
             } else if (section === 'portfolio') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.add('active');
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
+                statsSection.classList.remove('active');
                 if (connectedAccount) {
                     fetchPortfolio();
                 } else {
@@ -82,19 +88,113 @@ document.addEventListener('DOMContentLoaded', async () => {
                 portfolioSection.classList.remove('active');
                 buySection.classList.add('active');
                 founderSection.classList.remove('active');
+                statsSection.classList.remove('active');
             } else if (section === 'founder') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
                 buySection.classList.remove('active');
                 founderSection.classList.add('active');
+                statsSection.classList.remove('active');
+            } else if (section === 'stats') {
+                swapSection.classList.remove('active');
+                portfolioSection.classList.remove('active');
+                buySection.classList.remove('active');
+                founderSection.classList.remove('active');
+                statsSection.classList.add('active');
+                statsTitle.textContent = 'Stats'; // 기본 제목
             } else {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
+                statsSection.classList.remove('active');
             }
         });
     });
+
+    // 드롭다운 항목 클릭 시
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const statsType = item.getAttribute('data-stats');
+            if (statsType) {
+                swapSection.classList.remove('active');
+                portfolioSection.classList.remove('active');
+                buySection.classList.remove('active');
+                founderSection.classList.remove('active');
+                statsSection.classList.add('active');
+                statsTitle.textContent = item.textContent;
+
+                if (statsType === 'activity') {
+                    showActivityChart();
+                } else {
+                    // 다른 Stats 항목에 대한 처리 (미래 확장 가능)
+                    statsTitle.textContent = item.textContent;
+                }
+            }
+        });
+    });
+
+    // Activity 차트 표시 함수
+    function showActivityChart() {
+        if (activityChart) {
+            activityChart.destroy(); // 기존 차트 제거
+        }
+
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        activityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['May 13, 2023', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan 2024', 'Feb', 'Today'],
+                datasets: [{
+                    label: 'Social Interactions',
+                    data: [50000000, 25000000, 75000000, 100000000, 25000000, 50000000, 10000000, 5000000, 15000000, 30000000, 26738259],
+                    borderColor: '#00BFFF',
+                    backgroundColor: 'rgba(0, 191, 255, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#00FF00',
+                            callback: function(value) {
+                                if (value >= 1000000) {
+                                    return (value / 1000000) + 'M';
+                                } else if (value >= 1000) {
+                                    return (value / 1000) + 'K';
+                                }
+                                return value;
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 255, 0, 0.2)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#00FF00'
+                        },
+                        grid: {
+                            color: 'rgba(0, 255, 0, 0.2)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#00FF00'
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     // 모달 표시
     connectButton.addEventListener('click', () => {
