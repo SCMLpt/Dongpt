@@ -18,7 +18,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dongpt - Welcome to the Digital Frontier</title>
-    <link rel="stylesheet" href="style.css"> <!-- Separated CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
@@ -49,9 +49,9 @@
                 <div class="swap-field">
                     <label for="fromChain">From Chain:</label>
                     <select id="fromChain" onchange="updateTokenOptions('from')">
-                        <option value="416002">Algorand TestNet</option>
-                        <option value="1">Ethereum MainNet</option>
-                        <option value="56">Binance Smart Chain</option>
+                        <option value="algorand-testnet">Algorand TestNet</option>
+                        <option value="ethereum-mainnet">Ethereum MainNet</option>
+                        <option value="bsc-mainnet">Binance Smart Chain</option>
                         <!-- Add more chains as needed -->
                     </select>
                 </div>
@@ -69,9 +69,9 @@
                 <div class="swap-field">
                     <label for="toChain">To Chain:</label>
                     <select id="toChain" onchange="updateTokenOptions('to')">
-                        <option value="416002">Algorand TestNet</option>
-                        <option value="1">Ethereum MainNet</option>
-                        <option value="56">Binance Smart Chain</option>
+                        <option value="algorand-testnet">Algorand TestNet</option>
+                        <option value="ethereum-mainnet">Ethereum MainNet</option>
+                        <option value="bsc-mainnet">Binance Smart Chain</option>
                         <!-- Add more chains as needed -->
                     </select>
                 </div>
@@ -91,8 +91,8 @@
     <!-- Load Dependencies -->
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/web3@1.10.0/dist/web3.min.js"></script>
-    <!-- Socket SDK (assumed to be hosted locally in lib/) -->
-    <script src="lib/socket-sdk.min.js"></script>
+    <!-- Squid SDK (bundled locally) -->
+    <script src="lib/squid-sdk.min.js"></script>
     <script defer src="script.js"></script>
 
     <!-- Matrix Effect Script -->
