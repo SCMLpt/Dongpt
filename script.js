@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const amount = document.getElementById('amount');
     const swapSection = document.getElementById('swapSection');
     const portfolioSection = document.getElementById('portfolioSection');
+    const buySection = document.getElementById('buySection');
     const portfolioTableBody = document.querySelector('#portfolioTable tbody');
     const menuLinks = document.querySelectorAll('.menu-link');
 
@@ -63,17 +64,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (section === 'swap') {
                 swapSection.classList.add('active');
                 portfolioSection.classList.remove('active');
+                buySection.classList.remove('active');
             } else if (section === 'portfolio') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.add('active');
+                buySection.classList.remove('active');
                 if (connectedAccount) {
                     fetchPortfolio();
                 } else {
                     alert('Please connect a wallet to view your portfolio.');
                 }
+            } else if (section === 'buy') {
+                swapSection.classList.remove('active');
+                portfolioSection.classList.remove('active');
+                buySection.classList.add('active');
             } else {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
+                buySection.classList.remove('active');
             }
         });
     });
