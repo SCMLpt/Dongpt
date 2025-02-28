@@ -2,9 +2,81 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Dongpt</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dongpt - Welcome to the Digital Frontier</title>
     <style>
-        /* 기존 스타일 유지 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: #00FF00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .matrix-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background: url('https://via.placeholder.com/100?text=Matrix+Pattern') repeat; /* 실제 매트릭스 패턴 이미지로 교체 필요 */
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #00FF00;
+        }
+        .tagline {
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+        .navigation {
+            margin-top: 40px;
+        }
+        .nav-link {
+            color: #00FF00;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 5px #00FF00;
+        }
+        .connect-wallet {
+            margin-top: 20px;
+        }
+        #connectButton {
+            background-color: #000;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        #connectButton:hover {
+            background-color: #00FF00;
+            color: #000;
+            box-shadow: 0 0 15px #00FF00;
+        }
     </style>
 </head>
 <body>
@@ -23,11 +95,12 @@
         </div>
     </div>
 
-    <!-- 스크립트 로드 -->
+    <!-- 외부 자바스크립트 파일 로드 -->
+    
     <script src="js/pera-wallet-bundle.js"></script>
     <script src="script.js"></script>
 
-    <!-- 매트릭스 효과 스크립트 -->
+    <!-- 매트릭스 효과 스크립트 (직접 포함하거나 script.js로 이동 가능) -->
     <script>
         function createMatrixEffect() {
             const matrix = document.createElement('canvas');
@@ -72,4 +145,4 @@
         window.onload = createMatrixEffect;
     </script>
 </body>
-</html>
+</html>"
