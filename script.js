@@ -1,21 +1,43 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const connectButton = document.getElementById('connectButton');
     const walletModal = document.getElementById('walletModal');
     const walletOptions = document.getElementById('walletOptions');
+    const swapButton = document.getElementById('swapButton');
+    const chainSelect = document.getElementById('chainSelect');
+    const fromToken = document.getElementById('fromToken');
+    const toToken = document.getElementById('toToken');
+    const amount = document.getElementById('amount');
 
-    if (!connectButton) {
-        console.error('Connect button not found.');
+    if (!connectButton || !swapButton) {
+        console.error('Button not found.');
         return;
     }
 
-    // WalletConnect 초기화
+    // 지갑 상태 변수
     let walletConnectProvider = null;
+    let connectedWallet = null;
+    let connectedAccount = null;
+    let provider = null;
+
+    // Uniswap V2 Router 정보 (Ethereum MainNet)
+    const UNISWAP_ROUTER_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
+    const UNISWAP_ROUTER_ABI = [
+        'function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)'
+    ];
+
+    // 토큰 주소 (MainNet과 Sepolia)
+    const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'; // WETH (MainNet)
+    const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI (MainNet)
+    const WETH_SEPOLIA = '0x7b79995e5f9c58666d53eBb67F422f9B7fD4EcA6'; // WETH (Sepolia)
+    const DAI_SEPOLIA = '0xFF34B3d4AeeFDde989b3eA9bF939CdaA41C9F4D2'; // DAI (Sepolia)
+
+    // WalletConnect 초기화
     if (typeof WalletConnectProvider !== 'undefined') {
         walletConnectProvider = new WalletConnectProvider.default({
             rpc: {
-                416002: "https://testnet-api.algonode.cloud" // Algorand TestNet
-            },
-            chainId: 416002
+                1: "https://eth-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY",
+                11155111: "https://eth-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_KEY"
+            }
         });
         console.log('WalletConnect SDK loaded successfully!');
     } else {
@@ -32,33 +54,111 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedWallet = event.target.getAttribute('data-wallet');
         if (!selectedWallet) return;
 
-        walletModal.style.display = 'none'; // 모달 닫기
+        walletModal.style.display = 'none';
 
         try {
             if (selectedWallet === 'walletconnect' && walletConnectProvider) {
                 await walletConnectProvider.enable();
+                connectedWallet = 'walletconnect';
+                connectedAccount = walletConnectProvider.accounts[0];
+                provider = new ethers.providers.Web3Provider(walletConnectProvider);
                 console.log('Connected accounts (WalletConnect):', walletConnectProvider.accounts);
                 if (walletConnectProvider.accounts.length > 0) {
-                    alert(`Connected to WalletConnect: ${walletConnectProvider.accounts[0]}`);
+                    alert(`Connected to WalletConnect: ${connectedAccount}`);
+                    connectButton.textContent = `Connected: ${connectedAccount.slice(0, 6)}...`;
                 } else {
-                    alert('No accounts connected. Please scan the QR code with a mobile app.');
+                    alert('No accounts connected. Please scan the QR code.');
                 }
             } else if (selectedWallet === 'metamask') {
                 if (typeof window.ethereum !== 'undefined') {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    connectedWallet = 'metamask';
+                    connectedAccount = accounts[0];
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
                     console.log('Connected accounts (MetaMask):', accounts);
                     if (accounts.length > 0) {
-                        alert(`Connected to MetaMask: ${accounts[0]}`);
+                        alert(`Connected to MetaMask: ${connectedAccount}`);
+                        connectButton.textContent = `Connected: ${connectedAccount.slice(0, 6)}...`;
                     } else {
                         alert('No accounts connected via MetaMask.');
                     }
                 } else {
-                    alert('MetaMask is not installed. Please install it to connect.');
+                    alert('MetaMask is not installed.');
                 }
             }
         } catch (error) {
             console.error('Wallet connection error:', error);
-            alert('Failed to connect to wallet. Please try again.');
+            alert('Failed to connect to wallet.');
+        }
+    });
+
+    // 스왑 버튼 클릭 시
+    swapButton.addEventListener('click', async () => {
+        if (!connectedAccount || !provider) {
+            walletModal.style.display = 'flex';
+            alert('Please connect a wallet to perform a swap.');
+            return;
+        }
+
+        const chainId = parseInt(chainSelect.value);
+        const from = fromToken.value.toUpperCase();
+        const to = toToken.value.toUpperCase();
+        const swapAmount = amount.value;
+
+        if (!from || !to || !swapAmount) {
+            alert('Please fill in all fields.');
+            return;
+        }
+
+        try {
+            // 네트워크 확인
+            const network = await provider.getNetwork();
+            if (network.chainId !== chainId) {
+                alert(`Please switch to ${chainId === 1 ? 'Ethereum MainNet' : 'Sepolia'} in your wallet.`);
+                return;
+            }
+
+            // 토큰 주소 설정
+            const fromAddress = (chainId === 1 && from === 'WETH') ? WETH_ADDRESS : (chainId === 11155111 && from === 'WETH') ? WETH_SEPOLIA : null;
+            const toAddress = (chainId === 1 && to === 'DAI') ? DAI_ADDRESS : (chainId === 11155111 && to === 'DAI') ? DAI_SEPOLIA : null;
+
+            if (!fromAddress || !toAddress) {
+                alert('Unsupported token pair. Use WETH and DAI for this example.');
+                return;
+            }
+
+            const signer = provider.getSigner();
+            const routerContract = new ethers.Contract(UNISWAP_ROUTER_ADDRESS, UNISWAP_ROUTER_ABI, signer);
+
+            // 스왑 파라미터 설정
+            const amountIn = ethers.utils.parseEther(swapAmount);
+            const amountOutMin = 0;
+            const path = [fromAddress, toAddress];
+            const to = connectedAccount;
+            const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+
+            // 토큰 승인
+            const erc20Abi = ['function approve(address spender, uint256 amount) external returns (bool)'];
+            const tokenContract = new ethers.Contract(fromAddress, erc20Abi, signer);
+            const approveTx = await tokenContract.approve(UNISWAP_ROUTER_ADDRESS, amountIn);
+            await approveTx.wait();
+            console.log('Token approved for swap');
+
+            // 스왑 실행
+            const swapTx = await routerContract.swapExactTokensForTokens(
+                amountIn,
+                amountOutMin,
+                path,
+                to,
+                deadline,
+                { gasLimit: 300000 }
+            );
+            console.log('Swap transaction sent:', swapTx.hash);
+            await swapTx.wait();
+            alert(`Swap completed! Tx Hash: ${swapTx.hash}`);
+        } catch (error) {
+            console.error('Swap error:', error);
+            alert(`Swap failed: ${error.message}`);
         }
     });
 
