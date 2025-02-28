@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const fromToken = document.getElementById('fromToken');
     const toToken = document.getElementById('toToken');
     const amount = document.getElementById('amount');
+    const swapSection = document.getElementById('swapSection');
+    const portfolioSection = document.getElementById('portfolioSection');
+    const portfolioTableBody = document.querySelector('#portfolioTable tbody');
+    const menuLinks = document.querySelectorAll('.menu-link');
 
     if (!connectButton || !swapButton) {
         console.error('Button not found.');
@@ -31,6 +35,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const WETH_SEPOLIA = '0x7b79995e5f9c58666d53eBb67F422f9B7fD4EcA6'; // WETH (Sepolia)
     const DAI_SEPOLIA = '0xFF34B3d4AeeFDde989b3eA9bF939CdaA41C9F4D2'; // DAI (Sepolia)
 
+    // ERC-20 ABI (balanceOf 메서드 포함)
+    const ERC20_ABI = [
+        'function balanceOf(address owner) view returns (uint256)',
+        'function approve(address spender, uint256 amount) external returns (bool)',
+        'function decimals() view returns (uint8)'
+    ];
+
     // WalletConnect 초기화
     if (typeof WalletConnectProvider !== 'undefined') {
         walletConnectProvider = new WalletConnectProvider.default({
@@ -43,6 +54,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         console.error('WalletConnect SDK failed to load.');
     }
+
+    // 메뉴 클릭 시 섹션 전환
+    menuLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = link.getAttribute('data-section');
+            if (section === 'swap') {
+                swapSection.classList.add('active');
+                portfolioSection.classList.remove('active');
+            } else if (section === 'portfolio') {
+                swapSection.classList.remove('active');
+                portfolioSection.classList.add('active');
+                if (connectedAccount) {
+                    fetchPortfolio();
+                } else {
+                    alert('Please connect a wallet to view your portfolio.');
+                }
+            } else {
+                swapSection.classList.remove('active');
+                portfolioSection.classList.remove('active');
+            }
+        });
+    });
 
     // 모달 표시
     connectButton.addEventListener('click', () => {
@@ -85,6 +119,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     alert('MetaMask is not installed.');
                 }
+            }
+            // 지갑 연결 후 포트폴리오가 열려있다면 업데이트
+            if (portfolioSection.classList.contains('active')) {
+                fetchPortfolio();
             }
         } catch (error) {
             console.error('Wallet connection error:', error);
@@ -138,8 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 
             // 토큰 승인
-            const erc20Abi = ['function approve(address spender, uint256 amount) external returns (bool)'];
-            const tokenContract = new ethers.Contract(fromAddress, erc20Abi, signer);
+            const tokenContract = new ethers.Contract(fromAddress, ERC20_ABI, signer);
             const approveTx = await tokenContract.approve(UNISWAP_ROUTER_ADDRESS, amountIn);
             await approveTx.wait();
             console.log('Token approved for swap');
@@ -161,6 +198,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert(`Swap failed: ${error.message}`);
         }
     });
+
+    // 포트폴리오 조회 함수
+    async function fetchPortfolio() {
+        if (!connectedAccount || !provider) return;
+
+        portfolioTableBody.innerHTML = ''; // 테이블 초기화
+
+        const tokens = [
+            { name: 'WETH', address: chainSelect.value === '1' ? WETH_ADDRESS : WETH_SEPOLIA },
+            { name: 'DAI', address: chainSelect.value === '1' ? DAI_ADDRESS : DAI_SEPOLIA }
+        ];
+
+        for (const token of tokens) {
+            try {
+                const tokenContract = new ethers.Contract(token.address, ERC20_ABI, provider);
+                const balance = await tokenContract.balanceOf(connectedAccount);
+                const decimals = await tokenContract.decimals();
+                const formattedBalance = ethers.utils.formatUnits(balance, decimals);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${token.name}</td>
+                    <td>${formattedBalance}</td>
+                `;
+                portfolioTableBody.appendChild(row);
+            } catch (error) {
+                console.error(`Error fetching balance for ${token.name}:`, error);
+            }
+        }
+    }
 
     // 페이지 언로드 시 WalletConnect 연결 해제
     window.addEventListener('unload', async () => {
