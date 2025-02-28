@@ -41,6 +41,18 @@
         <div class="connect-wallet">
             <button id="connectButton">Connect Wallet</button>
         </div>
+        <!-- Wallet Selection Modal -->
+        <div class="wallet-modal" id="walletModal" style="display: none;">
+            <div class="wallet-modal-content">
+                <span class="close-modal" onclick="closeWalletModal()">&times;</span>
+                <h2>Select a Wallet</h2>
+                <div class="wallet-options">
+                    <button class="wallet-option" onclick="connectWallet('metamask')">MetaMask</button>
+                    <button class="wallet-option" onclick="connectWallet('coinbase')">Coinbase Wallet</button>
+                    <button class="wallet-option" onclick="connectWallet('walletconnect')">WalletConnect</button>
+                </div>
+            </div>
+        </div>
         <!-- Swap Interface -->
         <div class="swap-container" id="swapContainer" style="display: none;">
             <h2>Cross-Chain Swap</h2>
@@ -91,6 +103,8 @@
     <!-- Load Dependencies -->
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/web3@1.10.0/dist/web3.min.js"></script>
+    <!-- Coinbase Wallet SDK -->
+    <script src="https://unpkg.com/@coinbase/wallet-sdk@3.9.3/dist/index.min.js"></script>
     <!-- Squid SDK (bundled locally) -->
     <script src="lib/squid-sdk.min.js"></script>
     <script defer src="script.js"></script>
