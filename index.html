@@ -1,33 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Tag Manager -->
-    <script>
-    (function(w,d,s,l,i){
-        w[l]=w[l]||[];
-        w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-        var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-        j.async=true;
-        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-        f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-N632F7P6');
-    </script>
-    <!-- End Google Tag Manager -->
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dongpt - Welcome to the Digital Frontier</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- 기존 스타일 유지 -->
+    <style>
+        /* 기존 스타일 유지, 모달 스타일 추가 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #000;
+            border: 2px solid #00FF00;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            color: #00FF00;
+        }
+        .wallet-option {
+            background: #000;
+            color: #00FF00;
+            border: 1px solid #00FF00;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .wallet-option:hover {
+            background: #00FF00;
+            color: #000;
+        }
+    </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N632F7P6"
-            height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
     <div class="matrix-background"></div>
     <div class="container">
         <div class="logo">DONGPT</div>
@@ -41,76 +56,25 @@
         <div class="connect-wallet">
             <button id="connectButton">Connect Wallet</button>
         </div>
-        <!-- Wallet Selection Modal -->
-        <div class="wallet-modal" id="walletModal" style="display: none;">
-            <div class="wallet-modal-content">
-                <span class="close-modal" onclick="closeWalletModal()">×</span>
-                <h2>Select a Wallet</h2>
-                <div class="wallet-options">
-                    <button class="wallet-option" onclick="connectWallet('metamask')">MetaMask</button>
-                    <button class="wallet-option" onclick="connectWallet('coinbase')">Coinbase Wallet</button>
-                    <button class="wallet-option" onclick="connectWallet('walletconnect')">WalletConnect</button>
-                </div>
-            </div>
-        </div>
-        <!-- Swap Interface -->
-        <div class="swap-container" id="swapContainer" style="display: none;">
-            <h2>Cross-Chain Swap</h2>
-            <div class="swap-form">
-                <!-- Source Chain and Token -->
-                <div class="swap-field">
-                    <label for="fromChain">From Chain:</label>
-                    <select id="fromChain" onchange="updateTokenOptions('from')">
-                        <option value="algorand-testnet">Algorand TestNet</option>
-                        <option value="ethereum-mainnet">Ethereum MainNet</option>
-                        <option value="bsc-mainnet">Binance Smart Chain</option>
-                        <!-- Add more chains as needed -->
-                    </select>
-                </div>
-                <div class="swap-field">
-                    <label for="fromToken">From Token:</label>
-                    <select id="fromToken">
-                        <!-- Options will be populated dynamically -->
-                    </select>
-                </div>
-                <div class="swap-field">
-                    <label for="fromAmount">Amount:</label>
-                    <input type="number" id="fromAmount" placeholder="Enter amount" step="0.01" />
-                </div>
-                <!-- Destination Chain and Token -->
-                <div class="swap-field">
-                    <label for="toChain">To Chain:</label>
-                    <select id="toChain" onchange="updateTokenOptions('to')">
-                        <option value="algorand-testnet">Algorand TestNet</option>
-                        <option value="ethereum-mainnet">Ethereum MainNet</option>
-                        <option value="bsc-mainnet">Binance Smart Chain</option>
-                        <!-- Add more chains as needed -->
-                    </select>
-                </div>
-                <div class="swap-field">
-                    <label for="toToken">To Token:</label>
-                    <select id="toToken">
-                        <!-- Options will be populated dynamically -->
-                    </select>
-                </div>
-                <!-- Swap Button -->
-                <button id="swapButton" onclick="initiateSwap()">Swap Tokens</button>
-                <div id="swapStatus"></div>
+    </div>
+
+    <!-- Wallet Selection Modal -->
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <h2>Select a Wallet</h2>
+            <div id="walletOptions">
+                <div class="wallet-option" data-wallet="walletconnect">WalletConnect</div>
+                <div class="wallet-option" data-wallet="metamask">MetaMask</div>
             </div>
         </div>
     </div>
 
-    <!-- Load Dependencies -->
+    <!-- WalletConnect Script -->
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-    <script src="https://unpkg.com/web3@1.10.0/dist/web3.min.js"></script>
-    <!-- Coinbase Wallet SDK -->
-    <script src="https://unpkg.com/@coinbase/wallet-sdk@3.9.3/dist/index.min.js"></script>
-    <!-- Squid SDK (bundled locally) -->
-    <script src="lib/squid-sdk.min.js"></script>
     <script defer src="script.js"></script>
-
-    <!-- Matrix Effect Script -->
+    <!-- Matrix Effect Script 유지 -->
     <script>
+        // Matrix Effect Script (기존 코드 유지)
         function createMatrixEffect() {
             const matrix = document.createElement('canvas');
             matrix.width = window.innerWidth;
