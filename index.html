@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dongpt - Welcome to the Digital Frontier</title>
-    <!-- Favicon 추가 -->
     <link rel="icon" type="image/png" href="https://scmlpt.github.io/Dongpt/logo.png">
     <style>
         body {
@@ -126,7 +125,7 @@
             font-size: clamp(0.8rem, 1.5vw, 1.5rem);
             margin-bottom: 3vh;
         }
-        .connect-wallet, .swap-section, .portfolio-section, .buy-section {
+        .connect-wallet, .swap-section, .portfolio-section, .buy-section, .founder-section {
             margin-top: 1.5vh;
         }
         #connectButton, #swapButton {
@@ -144,10 +143,10 @@
             color: #000;
             box-shadow: 0 0 15px #00FF00;
         }
-        .swap-section, .portfolio-section, .buy-section {
+        .swap-section, .portfolio-section, .buy-section, .founder-section {
             display: none;
         }
-        .swap-section.active, .portfolio-section.active, .buy-section.active {
+        .swap-section.active, .portfolio-section.active, .buy-section.active, .founder-section.active {
             display: block;
         }
         .swap-form {
@@ -177,7 +176,7 @@
         .portfolio-section th {
             background-color: #1a1a1a;
         }
-        .buy-section {
+        .buy-section, .founder-section {
             background: #1a1a1a;
             border: 2px solid #00FF00;
             padding: 20px;
@@ -186,11 +185,11 @@
             max-width: 500px;
             width: 100%;
         }
-        .buy-section p {
+        .buy-section p, .founder-section p {
             margin: 0 0 10px;
             font-size: 1rem;
         }
-        .buy-section a {
+        .buy-section a, .founder-section a {
             display: inline-block;
             background-color: #000;
             color: #00FF00;
@@ -200,7 +199,7 @@
             border-radius: 5px;
             transition: all 0.3s;
         }
-        .buy-section a:hover {
+        .buy-section a:hover, .founder-section a:hover {
             background-color: #00FF00;
             color: #000;
             box-shadow: 0 0 15px #00FF00;
@@ -374,6 +373,9 @@
             <div class="navbar-item">
                 <a href="#" class="menu-link" data-section="swap">Swap</a>
             </div>
+            <div class="navbar-item">
+                <a href="#" class="menu-link" data-section="founder">Founder</a>
+            </div>
         </div>
     </div>
 
@@ -413,6 +415,10 @@
             <div id="buySection" class="buy-section">
                 <p>Buy tokens on Tinyman (Algorand DEX)</p>
                 <a href="https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456" target="_blank">Go to Tinyman Swap</a>
+            </div>
+            <div id="founderSection" class="founder-section">
+                <p>Meet the Founder of Dongpt</p>
+                <a href="https://x.com/KamuiTranslator" target="_blank">Visit KamuiTranslator on X</a>
             </div>
         </div>
     </div>
