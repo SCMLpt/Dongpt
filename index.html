@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dongpt - Welcome to the Digital Frontier</title>
+    <!-- Favicon 추가 -->
+    <link rel="icon" type="image/png" href="https://scmlpt.github.io/Dongpt/logo.png">
     <style>
         body {
             margin: 0;
@@ -37,10 +39,11 @@
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0, 255, 0, 0.2);
         }
-        .navbar-logo img {
-            height: 40px; /* 로고 이미지 크기 조정 */
-            width: auto;
-            filter: drop-shadow(0 0 5px #00FF00); /* 네온 그린 그림자 효과 */
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 5px #00FF00;
         }
         .navbar-menu {
             display: flex;
@@ -249,7 +252,7 @@
             font-size: 1rem;
         }
         .wallet-option:hover {
-            background: #00FF00;
+            background-color: #00FF00;
             color: #000;
             box-shadow: 0 0 10px #00FF00;
         }
@@ -262,9 +265,6 @@
             }
             .dropdown {
                 width: 150px;
-            }
-            .navbar-logo img {
-                height: 30px;
             }
             .logo {
                 font-size: clamp(1.2rem, 5vw, 2.5rem);
@@ -300,9 +300,6 @@
             .dropdown {
                 position: static;
                 width: 100%;
-            }
-            .navbar-logo img {
-                height: 25px;
             }
             .logo {
                 font-size: clamp(1rem, 5vw, 2rem);
@@ -342,9 +339,7 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="navbar-logo">
-            <img src="logo.png" alt="Dongpt Logo">
-        </div>
+        <div class="navbar-logo">Dongpt</div>
         <div class="navbar-menu">
             <div class="navbar-item">
                 <a href="#" class="menu-link" data-section="stats">Stats</a>
