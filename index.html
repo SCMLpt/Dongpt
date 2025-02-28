@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Tag Manager -->
-    <script>
-    (function(w,d,s,l,i){
-        w[l]=w[l]||[];
-        w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-        var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-        j.async=true;
-        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-        f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-N632F7P6');
-    </script>
-    <!-- End Google Tag Manager -->
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dongpt - Welcome to the Digital Frontier</title>
@@ -25,11 +11,6 @@
             background-color: #000000;
             color: #00FF00;
             font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100%;
             box-sizing: border-box;
             overflow-x: hidden;
             overflow-y: auto;
@@ -43,6 +24,79 @@
             z-index: -1;
             opacity: 0.1;
             background: url('images/matrix-pattern.png') repeat;
+        }
+        .navbar {
+            background-color: #1a1a1a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.2);
+        }
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 5px #00FF00;
+        }
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .navbar-item {
+            position: relative;
+        }
+        .navbar-item a, .navbar-item button {
+            color: #cccccc;
+            text-decoration: none;
+            font-size: 1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            transition: color 0.3s;
+        }
+        .navbar-item a:hover, .navbar-item button:hover {
+            color: #00FF00;
+            text-shadow: 0 0 5px #00FF00;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.2);
+            border-radius: 5px;
+            z-index: 1001;
+        }
+        .navbar-item:hover .dropdown {
+            display: block;
+        }
+        .dropdown-item {
+            display: block;
+            padding: 10px 20px;
+            color: #cccccc;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .dropdown-item:hover {
+            background-color: #00FF00;
+            color: #000000;
+        }
+        .main-content {
+            margin-top: 60px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 60px);
         }
         .container {
             text-align: center;
@@ -70,25 +124,7 @@
             font-size: clamp(0.8rem, 1.5vw, 1.5rem);
             margin-bottom: 3vh;
         }
-        .navigation {
-            margin-top: 3vh;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.5vw;
-            min-width: 0;
-        }
-        .nav-link {
-            color: #00FF00;
-            text-decoration: none;
-            font-size: clamp(0.7rem, 1.2vw, 1rem);
-            white-space: nowrap;
-        }
-        .nav-link:hover {
-            text-decoration: underline;
-            text-shadow: 0 0 5px #00FF00;
-        }
-        .connect-wallet, .swap-section {
+        .connect-wallet, .swap-section, .portfolio-section {
             margin-top: 1.5vh;
         }
         #connectButton, #swapButton {
@@ -106,6 +142,12 @@
             color: #000;
             box-shadow: 0 0 15px #00FF00;
         }
+        .swap-section, .portfolio-section {
+            display: none;
+        }
+        .swap-section.active, .portfolio-section.active {
+            display: block;
+        }
         .swap-form {
             margin-top: 1vh;
         }
@@ -117,6 +159,21 @@
             margin: 5px 0;
             border-radius: 3px;
             font-family: 'Courier New', Courier, monospace;
+        }
+        .portfolio-section table {
+            border-collapse: collapse;
+            margin-top: 1vh;
+            width: 100%;
+            max-width: 500px;
+            color: #00FF00;
+        }
+        .portfolio-section th, .portfolio-section td {
+            border: 1px solid #00FF00;
+            padding: 8px;
+            text-align: left;
+        }
+        .portfolio-section th {
+            background-color: #1a1a1a;
         }
         canvas {
             position: absolute;
@@ -133,7 +190,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+            z-index: 1002;
             justify-content: center;
             align-items: center;
         }
@@ -170,14 +227,20 @@
             box-shadow: 0 0 10px #00FF00;
         }
         @media (max-width: 768px) {
+            .navbar-menu {
+                gap: 10px;
+            }
+            .navbar-item a, .navbar-item button {
+                font-size: 0.9rem;
+            }
+            .dropdown {
+                width: 150px;
+            }
             .logo {
                 font-size: clamp(1.2rem, 5vw, 2.5rem);
             }
             .tagline {
                 font-size: clamp(0.7rem, 2vw, 1.2rem);
-            }
-            .nav-link {
-                font-size: clamp(0.6rem, 1.5vw, 0.9rem);
             }
             #connectButton, #swapButton {
                 font-size: clamp(0.6rem, 1.5vw, 0.9rem);
@@ -187,27 +250,32 @@
                 padding: 10px 10px;
                 max-width: 85%;
             }
-            .navigation {
-                gap: 0.3vw;
-            }
             .swap-form select, .swap-form input {
                 width: 100%;
             }
         }
         @media (max-width: 480px) {
+            .navbar {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .navbar-menu {
+                flex-direction: column;
+                gap: 5px;
+                margin-top: 10px;
+            }
+            .navbar-item a, .navbar-item button {
+                font-size: 0.8rem;
+            }
+            .dropdown {
+                position: static;
+                width: 100%;
+            }
             .logo {
                 font-size: clamp(1rem, 5vw, 2rem);
             }
             .tagline {
                 font-size: clamp(0.6rem, 2.5vw, 1rem);
-            }
-            .navigation {
-                flex-direction: column;
-                gap: 1vh;
-                align-items: center;
-            }
-            .nav-link {
-                font-size: clamp(0.6rem, 2vw, 0.8rem);
             }
             #connectButton, #swapButton {
                 font-size: clamp(0.6rem, 2vw, 0.8rem);
@@ -228,9 +296,6 @@
             .tagline {
                 font-size: clamp(0.5rem, 2vw, 0.9rem);
             }
-            .nav-link {
-                font-size: clamp(0.5rem, 1.8vw, 0.7rem);
-            }
             #connectButton, #swapButton {
                 font-size: clamp(0.5rem, 1.8vw, 0.7rem);
                 padding: 2vh 4vw;
@@ -239,44 +304,81 @@
                 padding: 5px 5px;
                 max-width: 95%;
             }
-            .navigation {
-                gap: 0.8vh;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N632F7P6"
-            height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
+    <div class="navbar">
+        <div class="navbar-logo">Dongpt</div>
+        <div class="navbar-menu">
+            <div class="navbar-item">
+                <a href="#" class="menu-link" data-section="stats">Stats</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-item">Market Overview</a>
+                    <a href="#" class="dropdown-item">Trends</a>
+                    <a href="#" class="dropdown-item">Analytics</a>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <a href="#" class="menu-link" data-section="apps">Apps</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-item">DApp Explorer</a>
+                    <a href="#" class="dropdown-item">DeFi Tools</a>
+                    <a href="#" class="dropdown-item">NFT Marketplace</a>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <a href="#" class="menu-link" data-section="coins">Coins</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-item">Price Charts</a>
+                    <a href="#" class="dropdown-item">Token Info</a>
+                    <a href="#" class="dropdown-item">Watchlist</a>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <a href="#" class="menu-link">Buy</a>
+            </div>
+            <div class="navbar-item">
+                <a href="#" class="menu-link" data-section="portfolio">Portfolio</a>
+            </div>
+            <div class="navbar-item">
+                <a href="#" class="menu-link" data-section="swap">Swap</a>
+            </div>
+        </div>
+    </div>
 
-    <div class="matrix-background"></div>
-    <div class="container">
-        <div class="logo">DONGPT</div>
-        <div class="tagline">A Digital Corporation Product</div>
-        <div class="navigation">
-            <a href="https://scmlpt.github.io/" class="nav-link">Home</a>
-            <a href="#about" class="nav-link">About</a>
-            <a href="#docs" class="nav-link">Docs</a>
-            <a href="#plugins" class="nav-link">Plugins</a>
-        </div>
-        <div class="connect-wallet">
-            <button id="connectButton">Connect Wallet</button>
-        </div>
-        <div class="swap-section">
-            <h3>Token Swap</h3>
-            <div class="swap-form">
-                <select id="chainSelect">
-                    <option value="1">Ethereum MainNet</option>
-                    <option value="11155111">Ethereum Sepolia</option>
-                </select>
-                <input type="text" id="fromToken" placeholder="From (e.g., WETH)">
-                <input type="text" id="toToken" placeholder="To (e.g., DAI)">
-                <input type="number" id="amount" placeholder="Amount">
-                <button id="swapButton">Swap</button>
+    <div class="main-content">
+        <div class="matrix-background"></div>
+        <div class="container">
+            <div class="logo">DONGPT</div>
+            <div class="tagline">A Digital Corporation Product</div>
+            <div class="connect-wallet">
+                <button id="connectButton">Connect Wallet</button>
+            </div>
+            <div id="swapSection" class="swap-section">
+                <h3>Token Swap</h3>
+                <div class="swap-form">
+                    <select id="chainSelect">
+                        <option value="1">Ethereum MainNet</option>
+                        <option value="11155111">Ethereum Sepolia</option>
+                    </select>
+                    <input type="text" id="fromToken" placeholder="From (e.g., WETH)">
+                    <input type="text" id="toToken" placeholder="To (e.g., DAI)">
+                    <input type="number" id="amount" placeholder="Amount">
+                    <button id="swapButton">Swap</button>
+                </div>
+            </div>
+            <div id="portfolioSection" class="portfolio-section">
+                <h3>Your Portfolio</h3>
+                <table id="portfolioTable">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
