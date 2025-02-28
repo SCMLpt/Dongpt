@@ -88,10 +88,10 @@
             text-decoration: underline;
             text-shadow: 0 0 5px #00FF00;
         }
-        .connect-wallet {
+        .connect-wallet, .swap-section {
             margin-top: 1.5vh;
         }
-        #connectButton {
+        #connectButton, #swapButton {
             background-color: #000;
             color: #00FF00;
             border: 2px solid #00FF00;
@@ -101,13 +101,23 @@
             border-radius: 5px;
             transition: all 0.3s;
         }
-        #connectButton:hover {
+        #connectButton:hover, #swapButton:hover {
             background-color: #00FF00;
             color: #000;
             box-shadow: 0 0 15px #00FF00;
         }
-
-        /* Matrix canvas styling */
+        .swap-form {
+            margin-top: 1vh;
+        }
+        .swap-form select, .swap-form input {
+            background: #000;
+            color: #00FF00;
+            border: 1px solid #00FF00;
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
         canvas {
             position: absolute;
             top: 0;
@@ -115,8 +125,6 @@
             z-index: 0;
             pointer-events: none;
         }
-
-        /* Modal styling */
         .modal {
             display: none;
             position: fixed;
@@ -161,8 +169,6 @@
             color: #000;
             box-shadow: 0 0 10px #00FF00;
         }
-
-        /* Media queries */
         @media (max-width: 768px) {
             .logo {
                 font-size: clamp(1.2rem, 5vw, 2.5rem);
@@ -173,7 +179,7 @@
             .nav-link {
                 font-size: clamp(0.6rem, 1.5vw, 0.9rem);
             }
-            #connectButton {
+            #connectButton, #swapButton {
                 font-size: clamp(0.6rem, 1.5vw, 0.9rem);
                 padding: 1.5vh 3vw;
             }
@@ -184,8 +190,10 @@
             .navigation {
                 gap: 0.3vw;
             }
+            .swap-form select, .swap-form input {
+                width: 100%;
+            }
         }
-
         @media (max-width: 480px) {
             .logo {
                 font-size: clamp(1rem, 5vw, 2rem);
@@ -201,7 +209,7 @@
             .nav-link {
                 font-size: clamp(0.6rem, 2vw, 0.8rem);
             }
-            #connectButton {
+            #connectButton, #swapButton {
                 font-size: clamp(0.6rem, 2vw, 0.8rem);
                 padding: 2vh 4vw;
             }
@@ -213,7 +221,6 @@
                 width: 90%;
             }
         }
-
         @media (max-width: 360px) {
             .logo {
                 font-size: clamp(0.9rem, 4vw, 1.8rem);
@@ -224,7 +231,7 @@
             .nav-link {
                 font-size: clamp(0.5rem, 1.8vw, 0.7rem);
             }
-            #connectButton {
+            #connectButton, #swapButton {
                 font-size: clamp(0.5rem, 1.8vw, 0.7rem);
                 padding: 2vh 4vw;
             }
@@ -259,6 +266,19 @@
         <div class="connect-wallet">
             <button id="connectButton">Connect Wallet</button>
         </div>
+        <div class="swap-section">
+            <h3>Token Swap</h3>
+            <div class="swap-form">
+                <select id="chainSelect">
+                    <option value="1">Ethereum MainNet</option>
+                    <option value="11155111">Ethereum Sepolia</option>
+                </select>
+                <input type="text" id="fromToken" placeholder="From (e.g., WETH)">
+                <input type="text" id="toToken" placeholder="To (e.g., DAI)">
+                <input type="number" id="amount" placeholder="Amount">
+                <button id="swapButton">Swap</button>
+            </div>
+        </div>
     </div>
 
     <!-- Wallet Selection Modal -->
@@ -272,8 +292,9 @@
         </div>
     </div>
 
-    <!-- Load WalletConnect Script -->
+    <!-- 의존성 스크립트 -->
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script defer src="script.js"></script>
 
     <!-- Matrix Effect Script -->
