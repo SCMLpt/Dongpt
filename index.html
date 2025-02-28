@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dongpt - Welcome to the Digital Frontier</title>
     <link rel="icon" type="image/png" href="https://scmlpt.github.io/Dongpt/logo.png">
+    <!-- Chart.js CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -125,7 +127,7 @@
             font-size: clamp(0.8rem, 1.5vw, 1.5rem);
             margin-bottom: 3vh;
         }
-        .connect-wallet, .swap-section, .portfolio-section, .buy-section, .founder-section {
+        .connect-wallet, .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section {
             margin-top: 1.5vh;
         }
         #connectButton, #swapButton {
@@ -143,10 +145,10 @@
             color: #000;
             box-shadow: 0 0 15px #00FF00;
         }
-        .swap-section, .portfolio-section, .buy-section, .founder-section {
+        .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section {
             display: none;
         }
-        .swap-section.active, .portfolio-section.active, .buy-section.active, .founder-section.active {
+        .swap-section.active, .portfolio-section.active, .buy-section.active, .founder-section.active, .stats-section.active {
             display: block;
         }
         .swap-form {
@@ -176,16 +178,16 @@
         .portfolio-section th {
             background-color: #1a1a1a;
         }
-        .buy-section, .founder-section {
+        .buy-section, .founder-section, .stats-section {
             background: #1a1a1a;
             border: 2px solid #00FF00;
             padding: 20px;
             border-radius: 5px;
             text-align: center;
-            max-width: 500px;
+            max-width: 800px;
             width: 100%;
         }
-        .buy-section p, .founder-section p {
+        .buy-section p, .founder-section p, .stats-section p {
             margin: 0 0 10px;
             font-size: 1rem;
         }
@@ -203,6 +205,15 @@
             background-color: #00FF00;
             color: #000;
             box-shadow: 0 0 15px #00FF00;
+        }
+        .stats-section h3 {
+            margin: 0 0 15px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px #00FF00;
+        }
+        .stats-section canvas {
+            max-width: 100%;
+            height: 300px;
         }
         canvas {
             position: absolute;
@@ -282,6 +293,9 @@
             .swap-form select, .swap-form input {
                 width: 100%;
             }
+            .stats-section canvas {
+                height: 200px;
+            }
         }
         @media (max-width: 480px) {
             .navbar {
@@ -343,9 +357,15 @@
             <div class="navbar-item">
                 <a href="#" class="menu-link" data-section="stats">Stats</a>
                 <div class="dropdown">
-                    <a href="#" class="dropdown-item">Market Overview</a>
-                    <a href="#" class="dropdown-item">Trends</a>
-                    <a href="#" class="dropdown-item">Analytics</a>
+                    <a href="#" class="dropdown-item" data-stats="blocks">Blocks</a>
+                    <a href="#" class="dropdown-item" data-stats="bridge">Bridge</a>
+                    <a href="#" class="dropdown-item" data-stats="activity">Activity</a>
+                    <a href="#" class="dropdown-item" data-stats="validators">Validators</a>
+                    <a href="#" class="dropdown-item" data-stats="gas">Gas</a>
+                    <a href="#" class="dropdown-item" data-stats="locked">Locked</a>
+                    <a href="#" class="dropdown-item" data-stats="leagues">Leagues</a>
+                    <a href="#" class="dropdown-item" data-stats="pulsex">PulseX</a>
+                    <a href="#" class="dropdown-item" data-stats="liquidity">Liquidity</a>
                 </div>
             </div>
             <div class="navbar-item">
@@ -419,6 +439,10 @@
             <div id="founderSection" class="founder-section">
                 <p>Meet the Founder of Dongpt</p>
                 <a href="https://x.com/KamuiTranslator" target="_blank">Visit KamuiTranslator on X</a>
+            </div>
+            <div id="statsSection" class="stats-section">
+                <h3 id="statsTitle">Stats</h3>
+                <canvas id="activityChart"></canvas>
             </div>
         </div>
     </div>
