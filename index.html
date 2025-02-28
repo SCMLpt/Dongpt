@@ -124,7 +124,7 @@
             font-size: clamp(0.8rem, 1.5vw, 1.5rem);
             margin-bottom: 3vh;
         }
-        .connect-wallet, .swap-section, .portfolio-section {
+        .connect-wallet, .swap-section, .portfolio-section, .buy-section {
             margin-top: 1.5vh;
         }
         #connectButton, #swapButton {
@@ -142,10 +142,10 @@
             color: #000;
             box-shadow: 0 0 15px #00FF00;
         }
-        .swap-section, .portfolio-section {
+        .swap-section, .portfolio-section, .buy-section {
             display: none;
         }
-        .swap-section.active, .portfolio-section.active {
+        .swap-section.active, .portfolio-section.active, .buy-section.active {
             display: block;
         }
         .swap-form {
@@ -174,6 +174,34 @@
         }
         .portfolio-section th {
             background-color: #1a1a1a;
+        }
+        .buy-section {
+            background: #1a1a1a;
+            border: 2px solid #00FF00;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .buy-section p {
+            margin: 0 0 10px;
+            font-size: 1rem;
+        }
+        .buy-section a {
+            display: inline-block;
+            background-color: #000;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .buy-section a:hover {
+            background-color: #00FF00;
+            color: #000;
+            box-shadow: 0 0 15px #00FF00;
         }
         canvas {
             position: absolute;
@@ -336,7 +364,7 @@
                 </div>
             </div>
             <div class="navbar-item">
-                <a href="#" class="menu-link">Buy</a>
+                <a href="#" class="menu-link" data-section="buy">Buy</a>
             </div>
             <div class="navbar-item">
                 <a href="#" class="menu-link" data-section="portfolio">Portfolio</a>
@@ -379,6 +407,10 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+            </div>
+            <div id="buySection" class="buy-section">
+                <p>Buy tokens on Tinyman (Algorand DEX)</p>
+                <a href="https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456" target="_blank">Go to Tinyman Swap</a>
             </div>
         </div>
     </div>
