@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 statsTitle.textContent = item.textContent;
 
                 if (statsType === 'activity') {
-                    showActivityChart();
+                    fetchAndShowActivityChart();
                 } else {
                     // 다른 Stats 항목에 대한 처리 (미래 확장 가능)
                     statsTitle.textContent = item.textContent;
@@ -135,20 +135,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Activity 차트 표시 함수
-    function showActivityChart() {
+    // Activity 차트 데이터 가져오기 및 표시
+    async function fetchAndShowActivityChart() {
         if (activityChart) {
             activityChart.destroy(); // 기존 차트 제거
         }
+
+        // 실제 데이터 가져오기 (프록시 서버 또는 더미 데이터 사용)
+        let data;
+        try {
+            // 프록시 서버에서 데이터 가져오기 (실제 서버 URL로 교체 필요)
+            const response = await fetch('http://localhost:3000/api/social-interactions');
+            data = await response.json();
+        } catch (error) {
+            console.error('Error fetching social interactions:', error);
+            // 더미 데이터로 대체
+            data = {
+                '2024-02-22': 5000,
+                '2024-02-23': 7500,
+                '2024-02-24': 3000,
+                '2024-02-25': 10000,
+                '2024-02-26': 2500,
+                '2024-02-27': 6000,
+                '2024-02-28': 4500
+            };
+        }
+
+        const labels = Object.keys(data).sort();
+        const values = labels.map(date => data[date]);
 
         const ctx = document.getElementById('activityChart').getContext('2d');
         activityChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['May 13, 2023', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan 2024', 'Feb', 'Today'],
+                labels: labels,
                 datasets: [{
                     label: 'Social Interactions',
-                    data: [50000000, 25000000, 75000000, 100000000, 25000000, 50000000, 10000000, 5000000, 15000000, 30000000, 26738259],
+                    data: values,
                     borderColor: '#00BFFF',
                     backgroundColor: 'rgba(0, 191, 255, 0.2)',
                     fill: true,
