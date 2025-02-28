@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     // SDK 로드 여부 확인
+
+    if (typeof PeraWalletConnect === 'undefined') {
+        console.error('Pera Wallet SDK가 로드되지 않았습니다.');
+    } else {
+        console.log('Pera Wallet SDK가 로드되었습니다.');
+        // SDK 초기화 코드 작성
+        const peraWallet = new PeraWalletConnect();
+        // 여기서 필요한 SDK 기능 사용
+    }
+
+
+
+    
     if (typeof PeraWalletConnect === 'undefined') {
         console.error('Pera Wallet SDK가 로드되지 않았습니다.');
         alert('Pera Wallet SDK를 로드할 수 없어요. 페이지를 새로고침하거나 인터넷 연결을 확인하세요.');
