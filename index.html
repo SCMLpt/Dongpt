@@ -145,6 +145,23 @@
             color: #000;
             box-shadow: 0 0 15px #00FF00;
         }
+        .network-join-button {
+            display: inline-block;
+            background-color: #000;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            padding: 1vh 2vw;
+            font-size: clamp(0.7rem, 1vw, 1rem);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+            margin-top: 1vh;
+        }
+        .network-join-button:hover {
+            background-color: #00FF00;
+            color: #000;
+            box-shadow: 0 0 15px #00FF00;
+        }
         .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section, .dongpt-explorer-section {
             display: none;
         }
@@ -266,7 +283,6 @@
             color: #000;
             box-shadow: 0 0 10px #00FF00;
         }
-        /* 미니 화면 스타일 */
         .network-monitor {
             position: fixed;
             top: 50px;
@@ -366,7 +382,7 @@
                 width: 90%;
             }
             .network-monitor {
-                display: none; /* 작은 화면에서는 미니 화면 숨김 */
+                display: none;
             }
         }
         @media (max-width: 360px) {
@@ -438,7 +454,6 @@
         </div>
     </div>
 
-    <!-- 네트워크 모니터 미니 화면 -->
     <div class="network-monitor" id="networkMonitor">
         <h4>Network Monitor</h4>
         <canvas id="networkFlowCanvas" width="200" height="50"></canvas>
@@ -452,6 +467,7 @@
             <div class="tagline">A Digital Corporation Product</div>
             <div class="connect-wallet">
                 <button id="connectButton">Connect Wallet</button>
+                <a href="https://scmlpt.github.io/Dongnet/" target="_blank" class="network-join-button">Join Network</a>
             </div>
             <div id="swapSection" class="swap-section">
                 <h3>Token Swap</h3>
@@ -505,7 +521,6 @@
         </div>
     </div>
 
-    <!-- Wallet Selection Modal -->
     <div id="walletModal" class="modal">
         <div class="modal-content">
             <h2>Select a Wallet</h2>
@@ -516,7 +531,6 @@
         </div>
     </div>
 
-    <!-- 의존성 스크립트 -->
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="script.js" defer></script>
