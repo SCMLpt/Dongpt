@@ -141,10 +141,10 @@
             font-size: clamp(0.8rem, 1.5vw, 1.5rem);
             margin-bottom: 3vh;
         }
-        .connect-wallet, .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section, .dongpt-explorer-section {
+        .connect-wallet, .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section, .dongpt-explorer-section, .mine-coins-section {
             margin-top: 1.5vh;
         }
-        #connectButton, #swapButton {
+        #connectButton, #swapButton, #mineButton {
             background-color: #000;
             color: #00FF00;
             border: 2px solid #00FF00;
@@ -154,15 +154,15 @@
             border-radius: 5px;
             transition: all 0.3s;
         }
-        #connectButton:hover, #swapButton:hover {
+        #connectButton:hover, #swapButton:hover, #mineButton:hover {
             background-color: #00FF00;
             color: #000;
             box-shadow: 0 0 15px #00FF00;
         }
-        .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section, .dongpt-explorer-section {
+        .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section, .dongpt-explorer-section, .mine-coins-section {
             display: none;
         }
-        .swap-section.active, .portfolio-section.active, .buy-section.active, .founder-section.active, .stats-section.active, .dongpt-explorer-section.active {
+        .swap-section.active, .portfolio-section.active, .buy-section.active, .founder-section.active, .stats-section.active, .dongpt-explorer-section.active, .mine-coins-section.active {
             display: block;
         }
         .swap-form {
@@ -177,19 +177,19 @@
             border-radius: 3px;
             font-family: 'Courier New', Courier, monospace;
         }
-        .portfolio-section table, .dongpt-explorer-section table {
+        .portfolio-section table, .dongpt-explorer-section table, .mine-coins-section table {
             border-collapse: collapse;
             margin-top: 1vh;
             width: 100%;
             max-width: 500px;
             color: #00FF00;
         }
-        .portfolio-section th, .portfolio-section td, .dongpt-explorer-section th, .dongpt-explorer-section td {
+        .portfolio-section th, .portfolio-section td, .dongpt-explorer-section th, .dongpt-explorer-section td, .mine-coins-section th, .mine-coins-section td {
             border: 1px solid #00FF00;
             padding: 8px;
             text-align: left;
         }
-        .portfolio-section th, .dongpt-explorer-section th {
+        .portfolio-section th, .dongpt-explorer-section th, .mine-coins-section th {
             background-color: #1a1a1a;
         }
         .buy-section, .founder-section, .stats-section {
@@ -454,6 +454,9 @@
                 <a href="#" class="menu-link" data-section="dongpt-explorer">Dongpt Explorer</a>
             </div>
             <div class="navbar-item">
+                <a href="#" class="menu-link" data-section="mine-coins">Mine Coins</a>
+            </div>
+            <div class="navbar-item">
                 <a href="#" class="menu-link" data-section="founder">Founder</a>
             </div>
         </div>
@@ -523,6 +526,21 @@
                     <tbody></tbody>
                 </table>
             </div>
+            <div id="mineCoinsSection" class="mine-coins-section">
+                <h3>Mine Dongpt Coins</h3>
+                <button id="mineButton">Mine Now</button>
+                <p>Total Mined: <span id="totalMined">0</span> DONGPT</p>
+                <p>Mining Attempts: <span id="miningAttempts">0</span></p>
+                <table id="miningHistoryTable">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Amount Mined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="miningHistoryBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -544,5 +562,6 @@
     <script src="matrix_link.js" defer></script>
     <script src="dongpt_holder.js" defer></script>
     <script src="network_monitor.js" defer></script>
+    <script src="mine_coins.js" defer></script>
 </body>
 </html>
