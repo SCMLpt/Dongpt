@@ -1,4 +1,4 @@
-// Algorand API를 사용하여 Dongpt 홀더 정보를 가져오는 함수
+// Algorand SDK를 사용하여 Dongpt 홀더 정보를 가져오는 함수
 async function fetchDongptHolders() {
     const tableBody = document.querySelector('#dongptExplorerTable tbody');
     if (!tableBody) {
@@ -9,25 +9,32 @@ async function fetchDongptHolders() {
     tableBody.innerHTML = ''; // 테이블 초기화
 
     try {
-        // Algorand Indexer API를 사용하여 자산 정보 가져오기
-        const assetId = '2800093456'; // Dongpt 자산 ID
-        const response = await fetch(`https://algoindexer.algoexplorerapi.io/v2/assets/${assetId}/balances?limit=10`);
-        const data = await response.json();
+        // Algorand Indexer 클라이언트 설정
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', '');
+        const assetId = 2800093456; // Dongpt 자산 ID
 
-        if (!data.balances || data.balances.length === 0) {
+        // 자산 정보 가져오기 (소수점 정보 확인)
+        const assetInfo = await indexerClient.lookupAssetByID(assetId).do();
+        const decimals = assetInfo.asset.params.decimals || 0;
+
+        // 자산 홀더 정보 가져오기
+        const response = await indexerClient.lookupAssetBalances(assetId).limit(10).do();
+        const balances = response.balances;
+
+        if (!balances || balances.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="2">No holders found.</td></tr>';
             return;
         }
 
         // 홀더 정보를 테이블에 렌더링
-        data.balances.forEach(holder => {
+        balances.forEach(holder => {
             const address = holder.address;
-            const balance = holder.amount; // Algorand의 경우 소수점 조정이 필요할 수 있음
+            const balance = holder.amount / Math.pow(10, decimals); // 소수점 조정
 
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${address}</td>
-                <td>${balance}</td>
+                <td>${balance.toFixed(2)}</td>
             `;
             tableBody.appendChild(row);
         });
@@ -54,8 +61,3 @@ async function fetchDongptHolders() {
 
 // 전역 함수로 노출 (script.js에서 호출 가능)
 window.fetchDongptHolders = fetchDongptHolders;
-
-// 페이지 로드 시 데이터 자동 로드
-window.onload = function() {
-    fetchDongptHolders();
-};
