@@ -18,7 +18,6 @@ function createMatrixEffect() {
     // 링크 데이터 (유명 플랫폼과 각 로고)
     const userLinks = [
         { url: 'https://x.com/KamuiTranslator', displayText: 'KamuiTranslator', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
-        { url: 'https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456', displayText: 'Tinyman Swap', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
         { url: 'https://www.google.com', displayText: 'Google', logo: 'https://www.google.com/favicon.ico' },
         { url: 'https://www.tiktok.com', displayText: 'TikTok', logo: 'https://www.tiktok.com/favicon.ico' },
         { url: 'https://www.youtube.com', displayText: 'YouTube', logo: 'https://www.youtube.com/favicon.ico' },
