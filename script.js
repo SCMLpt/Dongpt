@@ -24,33 +24,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 지갑 상태 변수
     let walletConnectProvider = null;
     let connectedWallet = null;
     let connectedAccount = null;
     let provider = null;
     let activityChart = null;
 
-    // Uniswap V2 Router 정보 (Ethereum MainNet)
     const UNISWAP_ROUTER_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
     const UNISWAP_ROUTER_ABI = [
         'function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)'
     ];
 
-    // 토큰 주소 (MainNet과 Sepolia)
-    const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'; // WETH (MainNet)
-    const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI (MainNet)
-    const WETH_SEPOLIA = '0x7b79995e5f9c58666d53eBb67F422f9B7fD4EcA6'; // WETH (Sepolia)
-    const DAI_SEPOLIA = '0xFF34B3d4AeeFDde989b3eA9bF939CdaA41C9F4D2'; // DAI (Sepolia)
+    const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+    const DAI_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
+    const WETH_SEPOLIA = '0x7b79995e5f9c58666d53eBb67F422f9B7fD4EcA6';
+    const DAI_SEPOLIA = '0xFF34B3d4AeeFDde989b3eA9bF939CdaA41C9F4D2';
 
-    // ERC-20 ABI (balanceOf 메서드 포함)
     const ERC20_ABI = [
         'function balanceOf(address owner) view returns (uint256)',
         'function approve(address spender, uint256 amount) external returns (bool)',
         'function decimals() view returns (uint8)'
     ];
 
-    // WalletConnect 초기화
     if (typeof WalletConnectProvider !== 'undefined') {
         walletConnectProvider = new WalletConnectProvider.default({
             rpc: {
@@ -63,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('WalletConnect SDK failed to load.');
     }
 
-    // 메뉴 클릭 시 섹션 전환
     menuLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -133,8 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.remove('active');
                 mineCoinsSection.classList.add('active');
-                if (window.updateMiningDisplay) {
-                    window.updateMiningDisplay();
+                if (window.updateNetworkDisplay) {
+                    window.updateNetworkDisplay();
                 }
             } else {
                 swapSection.classList.remove('active');
@@ -148,7 +142,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 드롭다운 항목 클릭 시
     dropdownItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -172,7 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Activity 차트 데이터 가져오기 및 표시
     async function fetchAndShowActivityChart() {
         if (activityChart) {
             activityChart.destroy();
@@ -253,12 +245,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 모달 표시
     connectButton.addEventListener('click', () => {
         walletModal.style.display = 'flex';
     });
 
-    // 지갑 선택 처리
     walletOptions.addEventListener('click', async (event) => {
         const selectedWallet = event.target.getAttribute('data-wallet');
         if (!selectedWallet) return;
@@ -304,7 +294,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 스왑 버튼 클릭 시
     swapButton.addEventListener('click', async () => {
         if (!connectedAccount || !provider) {
             walletModal.style.display = 'flex';
@@ -368,7 +357,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 포트폴리오 조회 함수
     async function fetchPortfolio() {
         if (!connectedAccount || !provider) return;
 
@@ -398,7 +386,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 페이지 언로드 시 WalletConnect 연결 해제
     window.addEventListener('unload', async () => {
         if (walletConnectProvider) {
             await walletConnectProvider.disconnect();
