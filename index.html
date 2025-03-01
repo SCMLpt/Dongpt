@@ -6,7 +6,6 @@
     <title>Dongpt - Welcome to the Digital Frontier</title>
     <link rel="icon" type="image/png" href="https://scmlpt.github.io/Dongpt/logo.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <!-- Algorand SDK 추가 -->
     <script src="https://unpkg.com/algosdk@2.7.0/dist/algosdk.min.js"></script>
     <style>
         body {
@@ -267,6 +266,35 @@
             color: #000;
             box-shadow: 0 0 10px #00FF00;
         }
+        /* 미니 화면 스타일 */
+        .network-monitor {
+            position: fixed;
+            top: 50px;
+            left: 10px;
+            width: 250px;
+            max-height: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00FF00;
+            border-radius: 5px;
+            z-index: 1001;
+            color: #00FF00;
+            font-size: 12px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .network-monitor canvas {
+            display: block;
+            margin: 0 auto;
+            position: static;
+            pointer-events: none;
+        }
+        .network-monitor p {
+            margin: 5px 0;
+            word-wrap: break-word;
+        }
+        .network-monitor .request {
+            margin-bottom: 10px;
+        }
         @media (max-width: 768px) {
             .navbar-menu {
                 gap: 10px;
@@ -296,6 +324,11 @@
             }
             .stats-section canvas {
                 height: 200px;
+            }
+            .network-monitor {
+                width: 200px;
+                max-height: 200px;
+                font-size: 10px;
             }
         }
         @media (max-width: 480px) {
@@ -331,6 +364,9 @@
             }
             .modal-content {
                 width: 90%;
+            }
+            .network-monitor {
+                display: none; /* 작은 화면에서는 미니 화면 숨김 */
             }
         }
         @media (max-width: 360px) {
@@ -400,6 +436,13 @@
                 <a href="#" class="menu-link" data-section="founder">Founder</a>
             </div>
         </div>
+    </div>
+
+    <!-- 네트워크 모니터 미니 화면 -->
+    <div class="network-monitor" id="networkMonitor">
+        <h4>Network Monitor</h4>
+        <canvas id="networkFlowCanvas" width="200" height="50"></canvas>
+        <div id="networkRequests"></div>
     </div>
 
     <div class="main-content">
@@ -479,5 +522,6 @@
     <script src="script.js" defer></script>
     <script src="matrix_link.js" defer></script>
     <script src="dongpt_holder.js" defer></script>
+    <script src="network_monitor.js" defer></script>
 </body>
 </html>
