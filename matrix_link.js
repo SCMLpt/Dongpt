@@ -30,7 +30,8 @@ function createMatrixEffect() {
         { url: 'https://www.wikipedia.org', displayText: 'Wikipedia', logo: 'https://www.wikipedia.org/favicon.ico' },
         { url: 'https://www.amazon.com', displayText: 'Amazon', logo: 'https://www.amazon.com/favicon.ico' },
         { url: 'https://www.netflix.com', displayText: 'Netflix', logo: 'https://www.netflix.com/favicon.ico' },
-        { url: 'https://www.spotify.com', displayText: 'Spotify', logo: 'https://www.spotify.com/favicon.ico' }
+        { url: 'https://www.spotify.com', displayText: 'Spotify', logo: 'https://www.spotify.com/favicon.ico' },
+        { url: 'https://www.instgram.com', displayText: 'Instagram', logo: 'https://www.instagram.com/favicon.ico' }
     ];
 
     // 로고 이미지 캐싱
