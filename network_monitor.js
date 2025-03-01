@@ -23,7 +23,7 @@
             duration: null,
             timestamp: new Date().toLocaleTimeString(),
             target: new URL(args[0]).hostname, // 요청을 받는 서버 이름
-            requestName: new URL(args[0]).pathname.includes('balances') ? 'GET Asset Balances' : 'GET Asset Info'
+            requestName: args[0].includes('minecoins.local') ? 'Mine Coin Request' : args[0].includes('balances') ? 'GET Asset Balances' : 'GET Asset Info'
         };
 
         // 요청 로그 추가
@@ -79,6 +79,8 @@
 
     // 네트워크 요청 렌더링 (간소화된 로그)
     function renderNetworkRequests() {
+        if (!networkRequests) return; // 네트워크 모니터 요소가 없으면 종료
+
         networkRequests.innerHTML = '';
 
         requestLogs.forEach(log => {
@@ -107,6 +109,8 @@
 
     // 네트워크 흐름 시각화 (화살표 개선)
     function drawNetworkFlow(request) {
+        if (!ctx) return; // 캔버스 컨텍스트가 없으면 종료
+
         ctx.clearRect(0, 0, networkFlowCanvas.width, networkFlowCanvas.height);
 
         // 배경
@@ -147,7 +151,7 @@
             return;
         }
 
-        // 클라이언트 (원)
+        // 클라이언트 (왼쪽 동그라미)
         ctx.beginPath();
         ctx.arc(50, 25, 15, 0, Math.PI * 2);
         ctx.fillStyle = '#00FF00';
@@ -157,13 +161,14 @@
         ctx.textAlign = 'center';
         ctx.fillText('Client', 50, 30);
 
-        // 서버 (원)
+        // 서버 (오른쪽 동그라미)
+        const targetLabel = request.url.includes('minecoins.local') ? 'Local Mining Server' : request.target.slice(0, 10) + '...';
         ctx.beginPath();
         ctx.arc(150, 25, 15, 0, Math.PI * 2);
         ctx.fillStyle = '#00FF00';
         ctx.fill();
         ctx.fillStyle = '#000000';
-        ctx.fillText('Server', 150, 30);
+        ctx.fillText(targetLabel, 150, 30); // 타겟 키워드 (짧게 표시)
 
         // 화살표 (클라이언트 -> 서버)
         ctx.beginPath();
@@ -207,12 +212,12 @@
             ctx.fillStyle = '#00FF00';
             ctx.fill();
 
-            // 더미 데이터 흐름 정보
+            // 더미 데이터 흐름 정보 ( 과정: "Load Dummy Data", 상태: "Success", 소요 시간: "0ms" )
             ctx.fillStyle = '#00FF00';
             ctx.font = '10px monospace';
             ctx.textAlign = 'center';
-            ctx.fillText('Target: Local', 100, 55);
-            ctx.fillText('Status: Success', 100, 65);
+            ctx.fillText('Load Dummy Data', 100, 55);
+            ctx.fillText('Success', 100, 65);
             ctx.fillText('Duration: 0ms', 100, 75);
         } else {
             // 화살표 머리
@@ -223,13 +228,13 @@
             ctx.fillStyle = '#00FF00';
             ctx.fill();
 
-            // 화살표 주변에 정보 표시
+            // 화살표 위에 과정 표시, 아래에 상태와 소요 시간 표시
             ctx.fillStyle = '#00FF00';
             ctx.font = '10px monospace';
             ctx.textAlign = 'center';
-            ctx.fillText(`Target: ${request.target}`, 100, 10);
-            ctx.fillText(`Status: ${request.status} (${request.statusCode})`, 100, 40);
-            ctx.fillText(`Duration: ${request.duration}ms`, 100, 50);
+            ctx.fillText(request.requestName, 100, 10); // 과정
+            ctx.fillText(`${request.status} (${request.statusCode})`, 100, 40); // 상태
+            ctx.fillText(`Duration: ${request.duration}ms`, 100, 50); // 소요 시간
         }
     }
 
