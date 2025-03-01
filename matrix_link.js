@@ -15,17 +15,28 @@ function createMatrixEffect() {
     ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
     ctx.fillRect(0, 0, matrix.width, matrix.height);
 
-    // 링크 데이터
+    // 링크 데이터 (유명 플랫폼 추가)
     const userLinks = [
         { url: 'https://x.com/KamuiTranslator', displayText: 'KamuiTranslator' },
         { url: 'https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456', displayText: 'Tinyman Swap' },
-        { url: 'https://example.com', displayText: 'Example Link' },
+        { url: 'https://www.google.com', displayText: 'Google' },
+        { url: 'https://www.tiktok.com', displayText: 'TikTok' },
+        { url: 'https://www.youtube.com', displayText: 'YouTube' },
+        { url: 'https://www.facebook.com', displayText: 'Facebook' },
+        { url: 'https://www.instagram.com', displayText: 'Instagram' },
+        { url: 'https://www.twitter.com', displayText: 'Twitter' },
+        { url: 'https://www.linkedin.com', displayText: 'LinkedIn' },
+        { url: 'https://www.reddit.com', displayText: 'Reddit' },
+        { url: 'https://www.wikipedia.org', displayText: 'Wikipedia' },
+        { url: 'https://www.amazon.com', displayText: 'Amazon' },
+        { url: 'https://www.netflix.com', displayText: 'Netflix' },
+        { url: 'https://www.spotify.com', displayText: 'Spotify' }
     ];
 
     // 로고 이미지 로드
     const logoImage = new Image();
     logoImage.src = 'https://scmlpt.github.io/Dongpt/logo.png';
-    const logoWidth = 30; // 로고 크기 조정
+    const logoWidth = 30;
     const logoHeight = 30;
 
     class Symbol {
@@ -42,32 +53,29 @@ function createMatrixEffect() {
                 this.value = String.fromCharCode(65 + Math.random() * 57);
                 this.color = '#00FF00'; // 기본 심볼은 초록색
             }
-            this.speed = 0.5 + Math.random() * 1.5; // 느린 속도
+            this.speed = 0.5 + Math.random() * 1.5;
             ctx.font = '16px monospace';
             this.width = ctx.measureText(this.value).width;
-            this.height = this.isLink ? this.value.length * 16 : 16; // 세로 텍스트 높이 계산
+            this.height = this.isLink ? this.value.length * 16 : 16;
             this.logoWidth = logoWidth;
             this.logoHeight = logoHeight;
-            this.totalHeight = this.isLink ? this.height + this.logoHeight + 5 : this.height; // 로고와 텍스트 간 간격 포함
+            this.totalHeight = this.isLink ? this.height + this.logoHeight + 5 : this.height;
         }
 
         draw() {
             if (this.isLink) {
-                // 세로 텍스트 그리기
                 ctx.fillStyle = this.color;
                 ctx.font = '16px monospace';
                 for (let i = 0; i < this.value.length; i++) {
-                    const charY = this.y + i * 16; // 글자마다 세로로 위치 조정
+                    const charY = this.y + i * 16;
                     ctx.fillText(this.value[i], this.x, charY);
                 }
 
-                // 로고 이미지 그리기 (텍스트 아래)
                 if (logoImage.complete) {
-                    const logoY = this.y + this.value.length * 16 + 5; // 텍스트 아래 5px 간격
+                    const logoY = this.y + this.value.length * 16 + 5;
                     ctx.drawImage(logoImage, this.x, logoY, this.logoWidth, this.logoHeight);
                 }
             } else {
-                // 일반 심볼은 기존처럼 수평으로 표시
                 ctx.fillStyle = this.color;
                 ctx.font = '16px monospace';
                 ctx.fillText(this.value, this.x, this.y);
@@ -75,7 +83,7 @@ function createMatrixEffect() {
 
             this.y += this.speed;
             if (this.y >= matrix.height) {
-                this.y = -this.totalHeight; // 심볼이 화면 밖으로 나가면 위로 리셋
+                this.y = -this.totalHeight;
                 this.x = Math.random() * matrix.width;
                 this.isLink = Math.random() < 0.1;
                 if (this.isLink) {
