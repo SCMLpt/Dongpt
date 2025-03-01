@@ -1,481 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="contourviewport" content="width=device-width, initial-scale=1.0">
-    <title>Dongpt - Welcome to the Digital Frontier</title>
-    <link rel="icon" type="image/png" href="https://scmlpt.github.io/Dongpt/logo.png">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000000;
-            color: #00FF00;
-            font-family: 'Courier New', Courier, monospace;
-            box-sizing: border-box;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-        .matrix-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.1;
-            background: url('images/matrix-pattern.png') repeat;
-        }
-        .navbar {
-            background-color: #1a1a1a;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.2);
-        }
-        .navbar-logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ffffff;
-            text-shadow: 0 0 5px #00FF00;
-        }
-        .navbar-menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        .navbar-item {
-            position: relative;
-        }
-        .navbar-item a, .navbar-item button {
-            color: #cccccc;
-            text-decoration: none;
-            font-size: 1rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 5px 10px;
-            transition: color 0.3s;
-        }
-        .navbar-item a:hover, .navbar-item button:hover {
-            color: #00FF00;
-            text-shadow: 0 0 5px #00FF00;
-        }
-        .dropdown {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #2a2a2a;
-            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.2);
-            border-radius: 5px;
-            z-index: 1001;
-        }
-        .navbar-item:hover .dropdown {
-            display: block;
-        }
-        .dropdown-item {
-            display: block;
-            padding: 10px 20px;
-            color: #cccccc;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        .dropdown-item:hover {
-            background-color: #00FF00;
-            color: #000000;
-        }
-        .main-content {
-            margin-top: 60px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(100vh - 60px);
-        }
-        .container {
-            text-align: center;
-            padding: 10px 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            max-width: 80%;
-            width: 100%;
-            box-sizing: border-box;
-            min-width: 0;
-            position: relative;
-            z-index: 1;
-            min-height: 200px;
-        }
-        .logo {
-            font-size: clamp(1.5rem, 4vw, 3rem);
-            font-weight: bold;
-            margin-bottom: 1.5vh;
-            letter-spacing: 0.3vw;
-            text-shadow: 0 0 10px #00FF00;
-        }
-        .tagline {
-            font-size: clamp(0.8rem, 1.5vw, 1.5rem);
-            margin-bottom: 3vh;
-        }
-        .connect-wallet, .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section, .dongpt-explorer-section {
-            margin-top: 1.5vh;
-        }
-        #connectButton, #swapButton {
-            background-color: #000;
-            color: #00FF00;
-            border: 2px solid #00FF00;
-            padding: 1vh 2vw;
-            font-size: clamp(0.7rem, 1vw, 1rem);
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        #connectButton:hover, #swapButton:hover {
-            background-color: #00FF00;
-            color: #000;
-            box-shadow: 0 0 15px #00FF00;
-        }
-        .swap-section, .portfolio-section, .buy-section, .founder-section, .stats-section, .dongpt-explorer-section {
-            display: none;
-        }
-        .swap-section.active, .portfolio-section.active, .buy-section.active, .founder-section.active, .stats-section.active, .dongpt-explorer-section.active {
-            display: block;
-        }
-        .swap-form {
-            margin-top: 1vh;
-        }
-        .swap-form select, .swap-form input {
-            background: #000;
-            color: #00FF00;
-            border: 1px solid #00FF00;
-            padding: 5px;
-            margin: 5px 0;
-            border-radius: 3px;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .portfolio-section table, .dongpt-explorer-section table {
-            border-collapse: collapse;
-            margin-top: 1vh;
-            width: 100%;
-            max-width: 500px;
-            color: #00FF00;
-        }
-        .portfolio-section th, .portfolio-section td, .dongpt-explorer-section th, .dongpt-explorer-section td {
-            border: 1px solid #00FF00;
-            padding: 8px;
-            text-align: left;
-        }
-        .portfolio-section th, .dongpt-explorer-section th {
-            background-color: #1a1a1a;
-        }
-        .buy-section, .founder-section, .stats-section {
-            background: #1a1a1a;
-            border: 2px solid #00FF00;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-            max-width: 800px;
-            width: 100%;
-        }
-        .buy-section p, .founder-section p, .stats-section p {
-            margin: 0 0 10px;
-            font-size: 1rem;
-        }
-        .buy-section a, .founder-section a {
-            display: inline-block;
-            background-color: #000;
-            color: #00FF00;
-            border: 2px solid #00FF00;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        .buy-section a:hover, .founder-section a:hover {
-            background-color: #00FF00;
-            color: #000;
-            box-shadow: 0 0 15px #00FF00;
-        }
-        .stats-section h3 {
-            margin: 0 0 15px;
-            font-size: 1.5rem;
-            text-shadow: 0 0 10px #00FF00;
-        }
-        .stats-section canvas {
-            max-width: 100%;
-            height: 300px;
-        }
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            pointer-events: auto;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1002;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: #000;
-            border: 2px solid #00FF00;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-            color: #00FF00;
-            width: 300px;
-            max-width: 90%;
-            box-shadow: 0 0 20px #00FF00;
-        }
-        .modal-content h2 {
-            margin: 0 0 15px;
-            font-size: 1.5rem;
-            text-shadow: 0 0 10px #00FF00;
-        }
-        .wallet-option {
-            background: #000;
-            color: #00FF00;
-            border: 1px solid #00FF00;
-            padding: 10px;
-            margin: 10px 0;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s;
-            font-size: 1rem;
-        }
-        .wallet-option:hover {
-            background-color: #00FF00;
-            color: #000;
-            box-shadow: 0 0 10px #00FF00;
-        }
-        @media (max-width: 768px) {
-            .navbar-menu {
-                gap: 10px;
-            }
-            .navbar-item a, .navbar-item button {
-                font-size: 0.9rem;
-            }
-            .dropdown {
-                width: 150px;
-            }
-            .logo {
-                font-size: clamp(1.2rem, 5vw, 2.5rem);
-            }
-            .tagline {
-                font-size: clamp(0.7rem, 2vw, 1.2rem);
-            }
-            #connectButton, #swapButton {
-                font-size: clamp(0.6rem, 1.5vw, 0.9rem);
-                padding: 1.5vh 3vw;
-            }
-            .container {
-                padding: 10px 10px;
-                max-width: 85%;
-            }
-            .swap-form select, .swap-form input {
-                width: 100%;
-            }
-            .stats-section canvas {
-                height: 200px;
-            }
-        }
-        @media (max-width: 480px) {
-            .navbar {
-                flex-direction: column;
-                padding: 10px;
-            }
-            .navbar-menu {
-                flex-direction: column;
-                gap: 5px;
-                margin-top: 10px;
-            }
-            .navbar-item a, .navbar-item button {
-                font-size: 0.8rem;
-            }
-            .dropdown {
-                position: static;
-                width: 100%;
-            }
-            .logo {
-                font-size: clamp(1rem, 5vw, 2rem);
-            }
-            .tagline {
-                font-size: clamp(0.6rem, 2.5vw, 1rem);
-            }
-            #connectButton, #swapButton {
-                font-size: clamp(0.6rem, 2vw, 0.8rem);
-                padding: 2vh 4vw;
-            }
-            .container {
-                padding: 5px 5px;
-                max-width: 90%;
-            }
-            .modal-content {
-                width: 90%;
-            }
-        }
-        @media (max-width: 360px) {
-            .logo {
-                font-size: clamp(0.9rem, 4vw, 1.8rem);
-            }
-            .tagline {
-                font-size: clamp(0.5rem, 2vw, 0.9rem);
-            }
-            #connectButton, #swapButton {
-                font-size: clamp(0.5rem, 1.8vw, 0.7rem);
-                padding: 2vh 4vw;
-            }
-            .container {
-                padding: 5px 5px;
-                max-width: 95%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="navbar">
-        <div class="navbar-logo">Dongpt</div>
-        <div class="navbar-menu">
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="stats">Stats</a>
-                <div class="dropdown">
-                    <a href="#" class="dropdown-item" data-stats="blocks">Blocks</a>
-                    <a href="#" class="dropdown-item" data-stats="bridge">Bridge</a>
-                    <a href="#" class="dropdown-item" data-stats="activity">Activity</a>
-                    <a href="#" class="dropdown-item" data-stats="validators">Validators</a>
-                    <a href="#" class="dropdown-item" data-stats="gas">Gas</a>
-                    <a href="#" class="dropdown-item" data-stats="locked">Locked</a>
-                    <a href="#" class="dropdown-item" data-stats="leagues">Leagues</a>
-                    <a href="#" class="dropdown-item" data-stats="liquidity">Liquidity</a>
-                </div>
-            </div>
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="apps">Apps</a>
-                <div class="dropdown">
-                    <a href="#" class="dropdown-item">DApp Explorer</a>
-                    <a href="#" class="dropdown-item">DeFi Tools</a>
-                    <a href="#" class="dropdown-item">NFT Marketplace</a>
-                </div>
-            </div>
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="coins">Coins</a>
-                <div class="dropdown">
-                    <a href="#" class="dropdown-item">Price Charts</a>
-                    <a href="#" class="dropdown-item">Token Info</a>
-                    <a href="#" class="dropdown-item">Watchlist</a>
-                </div>
-            </div>
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="buy">Buy</a>
-            </div>
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="portfolio">Portfolio</a>
-            </div>
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="swap">Swap</a>
-            </div>
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="dongpt-explorer">Dongpt Explorer</a>
-            </div>
-            <div class="navbar-item">
-                <a href="#" class="menu-link" data-section="founder">Founder</a>
-            </div>
-        </div>
-    </div>
+// Algorand API를 사용하여 Dongpt 홀더 정보를 가져오는 함수
+async function fetchDongptHolders() {
+    const tableBody = document.querySelector('#dongptExplorerTable tbody');
+    if (!tableBody) {
+        console.error('Dongpt Explorer table not found.');
+        return;
+    }
 
-    <div class="main-content">
-        <div class="matrix-background"></div>
-        <div class="container">
-            <div class="logo">DONGPT</div>
-            <div class="tagline">A Digital Corporation Product</div>
-            <div class="connect-wallet">
-                <button id="connectButton">Connect Wallet</button>
-            </div>
-            <div id="swapSection" class="swap-section">
-                <h3>Token Swap</h3>
-                <div class="swap-form">
-                    <select id="chainSelect">
-                        <option value="1">Ethereum MainNet</option>
-                        <option value="11155111">Ethereum Sepolia</option>
-                    </select>
-                    <input type="text" id="fromToken" placeholder="From (e.g., WETH)">
-                    <input type="text" id="toToken" placeholder="To (e.g., DAI)">
-                    <input type="number" id="amount" placeholder="Amount">
-                    <button id="swapButton">Swap</button>
-                </div>
-            </div>
-            <div id="portfolioSection" class="portfolio-section">
-                <h3>Your Portfolio</h3>
-                <table id="portfolioTable">
-                    <thead>
-                        <tr>
-                            <th>Token</th>
-                            <th>Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div id="buySection" class="buy-section">
-                <p>Buy tokens on Tinyman (Algorand DEX)</p>
-                <a href="https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456" target="_blank">Go to Tinyman Swap</a>
-            </div>
-            <div id="founderSection" class="founder-section">
-                <p>Meet the Founder of Dongpt</p>
-                <a href="https://x.com/KamuiTranslator" target="_blank">Visit KamuiTranslator on X</a>
-            </div>
-            <div id="statsSection" class="stats-section">
-                <h3 id="statsTitle">Stats</h3>
-                <canvas id="activityChart"></canvas>
-            </div>
-            <div id="dongptExplorerSection" class="dongpt-explorer-section">
-                <h3>Dongpt Explorer</h3>
-                <table id="dongptExplorerTable">
-                    <thead>
-                        <tr>
-                            <th>Holder Address</th>
-                            <th>Balance (DONGPT)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    tableBody.innerHTML = ''; // 테이블 초기화
 
-    <!-- Wallet Selection Modal -->
-    <div id="walletModal" class="modal">
-        <div class="modal-content">
-            <h2>Select a Wallet</h2>
-            <div id="walletOptions">
-                <div class="wallet-option" data-wallet="walletconnect">WalletConnect</div>
-                <div class="wallet-option" data-wallet="metamask">MetaMask</div>
-            </div>
-        </div>
-    </div>
+    try {
+        // Algorand Indexer API를 사용하여 자산 정보 가져오기
+        const assetId = '2800093456'; // Dongpt 자산 ID
+        const response = await fetch(`https://algoindexer.algoexplorerapi.io/v2/assets/${assetId}/balances?limit=10`);
+        const data = await response.json();
 
-    <!-- 의존성 스크립트 -->
-    <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <script src="script.js" defer></script>
-    <script src="matrix_link.js" defer></script>
-    <script src="dongpt_holder.js" defer></script>
-</body>
-</html>
+        if (!data.balances || data.balances.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="2">No holders found.</td></tr>';
+            return;
+        }
+
+        // 홀더 정보를 테이블에 렌더링
+        data.balances.forEach(holder => {
+            const address = holder.address;
+            const balance = holder.amount; // Algorand의 경우 소수점 조정이 필요할 수 있음
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${address}</td>
+                <td>${balance}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error fetching Dongpt holders:', error);
+
+        // 더미 데이터로 대체 (API 호출이 실패할 경우 테스트용)
+        const dummyData = [
+            { address: 'ADDRESS1...', amount: 1000 },
+            { address: 'ADDRESS2...', amount: 500 },
+            { address: 'ADDRESS3...', amount: 300 }
+        ];
+
+        dummyData.forEach(holder => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${holder.address}</td>
+                <td>${holder.amount}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+}
+
+// 전역 함수로 노출 (script.js에서 호출 가능)
+window.fetchDongptHolders = fetchDongptHolders;
+
+// 페이지 로드 시 데이터 자동 로드
+window.onload = function() {
+    fetchDongptHolders();
+};
