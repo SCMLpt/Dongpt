@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const founderSection = document.getElementById('founderSection');
     const statsSection = document.getElementById('statsSection');
     const dongptExplorerSection = document.getElementById('dongptExplorerSection');
+    const mineCoinsSection = document.getElementById('mineCoinsSection');
     const statsTitle = document.getElementById('statsTitle');
     const portfolioTableBody = document.querySelector('#portfolioTable tbody');
     const menuLinks = document.querySelectorAll('.menu-link');
@@ -74,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.remove('active');
             } else if (section === 'portfolio') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.add('active');
@@ -81,6 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.remove('active');
                 if (connectedAccount) {
                     fetchPortfolio();
                 } else {
@@ -93,6 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.remove('active');
             } else if (section === 'founder') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
@@ -100,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.add('active');
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.remove('active');
             } else if (section === 'stats') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
@@ -107,6 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.add('active');
                 dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.remove('active');
                 statsTitle.textContent = 'Stats';
             } else if (section === 'dongpt-explorer') {
                 swapSection.classList.remove('active');
@@ -115,9 +121,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.add('active');
-                // dongpt_holder.js에서 이미 데이터를 로드했으므로 필요 시 새로고침 가능
+                mineCoinsSection.classList.remove('active');
                 if (window.fetchDongptHolders) {
                     window.fetchDongptHolders();
+                }
+            } else if (section === 'mine-coins') {
+                swapSection.classList.remove('active');
+                portfolioSection.classList.remove('active');
+                buySection.classList.remove('active');
+                founderSection.classList.remove('active');
+                statsSection.classList.remove('active');
+                dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.add('active');
+                if (window.updateMiningDisplay) {
+                    window.updateMiningDisplay();
                 }
             } else {
                 swapSection.classList.remove('active');
@@ -126,6 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.remove('active');
             }
         });
     });
@@ -142,6 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.add('active');
                 dongptExplorerSection.classList.remove('active');
+                mineCoinsSection.classList.remove('active');
                 statsTitle.textContent = item.textContent;
 
                 if (statsType === 'activity') {
