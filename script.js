@@ -129,6 +129,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mineCoinsSection.classList.add('active');
                 if (window.updateNetworkDisplay) {
                     window.updateNetworkDisplay();
+                } else {
+                    console.warn('window.updateNetworkDisplay is not defined');
                 }
             } else {
                 swapSection.classList.remove('active');
@@ -392,4 +394,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Wallet disconnected');
         }
     });
+
+    // 페이지 로드 시 mine-coins 섹션이 활성화되어 있으면 updateNetworkDisplay 호출
+    if (mineCoinsSection.classList.contains('active') && window.updateNetworkDisplay) {
+        window.updateNetworkDisplay();
+    }
 });
