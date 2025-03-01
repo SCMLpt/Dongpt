@@ -1,72 +1,97 @@
-// 채굴 로직 초기화
-function initMining() {
-    // 채굴 상태 초기화
-    let miningData = JSON.parse(localStorage.getItem('miningData')) || {
-        totalMined: 0,
-        miningAttempts: 0,
-        history: []
+function initNetworkSharing() {
+    let networkData = JSON.parse(localStorage.getItem('networkData')) || {
+        participantId: `user-${Math.random().toString(36).substr(2, 9)}`,
+        totalContributions: 0,
+        lastUpdated: new Date().toISOString(),
+        actions: []
     };
 
-    // 채굴 데이터 표시 업데이트
-    function updateMiningDisplay() {
-        document.getElementById('totalMined').textContent = miningData.totalMined.toFixed(2);
-        document.getElementById('miningAttempts').textContent = miningData.miningAttempts;
+    // URL에서 공유된 데이터 불러오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('data');
+    let sharedActions = [];
+    if (sharedData) {
+        try {
+            sharedActions = JSON.parse(decodeURIComponent(atob(sharedData))).actions || [];
+        } catch (e) {
+            console.error('Invalid shared data:', e);
+        }
+    }
+
+    function updateNetworkDisplay() {
+        document.getElementById('totalMined').textContent = networkData.totalContributions.toFixed(2);
+        document.getElementById('miningAttempts').textContent = networkData.actions.length;
 
         const historyBody = document.getElementById('miningHistoryBody');
         historyBody.innerHTML = '';
-        miningData.history.forEach(record => {
+
+        // 내 기록 표시
+        networkData.actions.forEach(action => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${record.timestamp}</td>
-                <td>${record.amount.toFixed(2)}</td>
+                <td>${action.timestamp}</td>
+                <td>${action.description} (You)</td>
+            `;
+            historyBody.appendChild(row);
+        });
+
+        // 공유된 다른 사용자 기록 표시
+        sharedActions.forEach(action => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${action.timestamp}</td>
+                <td>${action.description} (Shared)</td>
             `;
             historyBody.appendChild(row);
         });
     }
 
-    // 채굴 함수
-    async function mineCoin() {
-        const amountMined = 1; // 1회 채굴당 1코인 (간단히 설정)
-        miningData.totalMined += amountMined;
-        miningData.miningAttempts += 1;
-        miningData.history.push({
+    function contributeToNetwork() {
+        const startTime = Date.now();
+        let contributionValue = Math.random() * 10;
+        for (let i = 0; i < 100000; i++) {
+            contributionValue += Math.sin(i) * 0.01;
+        }
+        const timeTaken = Date.now() - startTime;
+
+        networkData.totalContributions += contributionValue;
+        networkData.lastUpdated = new Date().toISOString();
+        networkData.actions.push({
             timestamp: new Date().toLocaleString(),
-            amount: amountMined
+            description: `Contributed ${contributionValue.toFixed(2)} units (${timeTaken}ms)`,
+            contributionValue: contributionValue
         });
 
-        // 로컬 스토리지에 저장
-        localStorage.setItem('miningData', JSON.stringify(miningData));
-
-        // 채굴 데이터 표시 업데이트
-        updateMiningDisplay();
-
-        // 더미 네트워크 요청 (네트워크 모니터 시각화를 위해)
-        try {
-            await fetch('https://dummy.minecoins.local/mine', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'mine_coin', amount: amountMined })
-            });
-        } catch (error) {
-            console.log('Dummy fetch for mining visualization failed (expected):', error);
+        if (networkData.actions.length > 50) {
+            networkData.actions.shift();
         }
 
-        // 네트워크 모니터에 채굴 액션 로그 추가
-        window.logAction('Mined Coin');
+        localStorage.setItem('networkData', JSON.stringify(networkData));
+        updateNetworkDisplay();
+
+        window.logAction(`Contribution: ${contributionValue.toFixed(2)} units (${timeTaken}ms)`);
     }
 
-    // 초기 채굴 데이터 표시
-    updateMiningDisplay();
+    // 공유 링크 생성 버튼 추가
+    const shareButton = document.createElement('button');
+    shareButton.textContent = 'Share My Contributions';
+    shareButton.addEventListener('click', () => {
+        const jsonData = JSON.stringify(networkData);
+        const encodedData = btoa(encodeURIComponent(jsonData));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
+        navigator.clipboard.writeText(shareUrl);
+        alert('Share URL copied to clipboard!');
+    });
+    document.getElementById('mineCoinsSection').appendChild(shareButton);
 
-    // Mine 버튼 이벤트 리스너 추가
-    const mineButton = document.getElementById('mineButton');
-    if (mineButton) {
-        mineButton.addEventListener('click', mineCoin);
-    }
+    const contributeButton = document.getElementById('mineButton');
+    contributeButton.textContent = 'Contribute to Network';
+    contributeButton.addEventListener('click', contributeToNetwork);
 
-    // 전역 함수로 노출 (script.js에서 호출 가능)
-    window.updateMiningDisplay = updateMiningDisplay;
+    updateNetworkDisplay();
+
+    window.updateNetworkDisplay = updateNetworkDisplay;
+    window.contributeToNetwork = contributeToNetwork;
 }
 
-// 페이지 로드 시 채굴 로직 초기화
-window.addEventListener('load', initMining);
+window.addEventListener('load', initNetworkSharing);
