@@ -25,7 +25,7 @@ function initMining() {
     }
 
     // 채굴 함수
-    function mineCoin() {
+    async function mineCoin() {
         const amountMined = 1; // 1회 채굴당 1코인 (간단히 설정)
         miningData.totalMined += amountMined;
         miningData.miningAttempts += 1;
@@ -39,6 +39,17 @@ function initMining() {
 
         // 채굴 데이터 표시 업데이트
         updateMiningDisplay();
+
+        // 더미 네트워크 요청 (네트워크 모니터 시각화를 위해)
+        try {
+            await fetch('https://dummy.minecoins.local/mine', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'mine_coin', amount: amountMined })
+            });
+        } catch (error) {
+            console.log('Dummy fetch for mining visualization failed (expected):', error);
+        }
 
         // 네트워크 모니터에 채굴 액션 로그 추가
         window.logAction('Mined Coin');
