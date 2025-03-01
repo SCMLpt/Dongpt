@@ -15,7 +15,7 @@ function createMatrixEffect() {
     ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
     ctx.fillRect(0, 0, matrix.width, matrix.height);
 
-    // 링크 데이터 (유명 플랫폼과 각 로고 추가)
+    // 링크 데이터 (유명 플랫폼과 각 로고)
     const userLinks = [
         { url: 'https://x.com/KamuiTranslator', displayText: 'KamuiTranslator', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
         { url: 'https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456', displayText: 'Tinyman Swap', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
@@ -33,14 +33,14 @@ function createMatrixEffect() {
         { url: 'https://www.spotify.com', displayText: 'Spotify', logo: 'https://www.spotify.com/favicon.ico' }
     ];
 
-    // 각 링크에 대해 로고 이미지 캐싱
+    // 로고 이미지 캐싱
     const logoImages = {};
     userLinks.forEach(link => {
         const img = new Image();
         img.src = link.logo;
         img.onerror = () => {
             console.warn(`Failed to load logo for ${link.displayText}, using fallback.`);
-            img.src = 'https://scmlpt.github.io/Dongpt/logo.png'; // 로드 실패 시 대체 로고
+            img.src = 'https://scmlpt.github.io/Dongpt/logo.png';
         };
         logoImages[link.displayText] = img;
     });
@@ -48,16 +48,34 @@ function createMatrixEffect() {
     const logoWidth = 30;
     const logoHeight = 30;
 
+    // 최근 사용된 링크 추적 (중복 방지)
+    const recentlyUsedLinks = new Set();
+    const cooldownTime = 5000; // 5초 동안 동일 링크 재사용 방지
+
     class Symbol {
         constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.isLink = true; // 항상 링크 심볼로 설정
-            const linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
+            this.isLink = true; // 항상 링크 심볼
+
+            // 중복되지 않는 링크 선택
+            let linkData;
+            let attempts = 0;
+            const maxAttempts = 10; // 최대 시도 횟수
+            do {
+                linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
+                attempts++;
+                if (attempts >= maxAttempts) {
+                    // 너무 많은 시도 실패 시 사용 가능한 첫 링크 선택
+                    linkData = userLinks.find(link => !recentlyUsedLinks.has(link.displayText)) || userLinks[0];
+                    break;
+                }
+            } while (recentlyUsedLinks.has(linkData.displayText));
+
             this.value = linkData.displayText;
             this.url = linkData.url;
             this.logo = logoImages[linkData.displayText];
-            this.color = '#00FF00'; // 모든 심볼을 초록색으로 통일
+            this.color = '#00FF00'; // 모든 심볼 초록색
             this.speed = 0.5 + Math.random() * 1.5;
             ctx.font = '16px monospace';
             this.width = ctx.measureText(this.value).width;
@@ -65,6 +83,12 @@ function createMatrixEffect() {
             this.logoWidth = logoWidth;
             this.logoHeight = logoHeight;
             this.totalHeight = this.height + this.logoHeight + 5;
+
+            // 최근 사용된 링크에 추가
+            recentlyUsedLinks.add(this.value);
+            setTimeout(() => {
+                recentlyUsedLinks.delete(this.value);
+            }, cooldownTime);
         }
 
         draw() {
@@ -84,13 +108,32 @@ function createMatrixEffect() {
             if (this.y >= matrix.height) {
                 this.y = -this.totalHeight;
                 this.x = Math.random() * matrix.width;
-                const linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
+
+                // 중복되지 않는 새로운 링크 선택
+                let linkData;
+                let attempts = 0;
+                const maxAttempts = 10;
+                do {
+                    linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        linkData = userLinks.find(link => !recentlyUsedLinks.has(link.displayText)) || userLinks[0];
+                        break;
+                    }
+                } while (recentlyUsedLinks.has(linkData.displayText));
+
                 this.value = linkData.displayText;
                 this.url = linkData.url;
                 this.logo = logoImages[linkData.displayText];
                 this.width = ctx.measureText(this.value).width;
                 this.height = this.value.length * 16;
                 this.totalHeight = this.height + this.logoHeight + 5;
+
+                // 최근 사용된 링크에 추가
+                recentlyUsedLinks.add(this.value);
+                setTimeout(() => {
+                    recentlyUsedLinks.delete(this.value);
+                }, cooldownTime);
             }
         }
 
