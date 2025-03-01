@@ -18,7 +18,6 @@ function createMatrixEffect() {
     // 링크 데이터 (유명 플랫폼과 각 로고)
     const userLinks = [
         { url: 'https://x.com/KamuiTranslator', displayText: 'KamuiTranslator', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
-        { url: 'https://scmlpt.github.io', displayText:'SCMLpt', logo:'https://github.com/SCMLpt/SCMLpt.github.io/blob/main/logo.jpg'},
         { url: 'https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456', displayText: 'Tinyman Swap', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
         { url: 'https://www.google.com', displayText: 'Google', logo: 'https://www.google.com/favicon.ico' },
         { url: 'https://www.tiktok.com', displayText: 'TikTok', logo: 'https://www.tiktok.com/favicon.ico' },
@@ -49,9 +48,40 @@ function createMatrixEffect() {
     const logoWidth = 30;
     const logoHeight = 30;
 
-    // 최근 사용된 링크 추적 (중복 방지)
-    const recentlyUsedLinks = new Set();
-    const cooldownTime = 5000; // 5초 동안 동일 링크 재사용 방지
+    // 링크 선택 빈도 추적 및 셔플링
+    const linkUsageCount = new Map(userLinks.map(link => [link.displayText, 0])); // 각 링크의 사용 횟수 추적
+    let availableLinks = [...userLinks]; // 셔플링용 링크 배열
+
+    // 링크 배열 셔플링 함수 (Fisher-Yates 알고리즘)
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // 링크 선택 함수 (최소 사용된 링크 선택 후 셔플링)
+    function selectLink() {
+        // 사용 횟수가 가장 적은 링크들 필터링
+        const minUsage = Math.min(...linkUsageCount.values());
+        const leastUsedLinks = Array.from(linkUsageCount.entries())
+            .filter(([_, count]) => count === minUsage)
+            .map(([displayText, _]) => userLinks.find(link => link.displayText === displayText));
+
+        // 사용 가능한 링크가 없으면 전체 링크로 리셋
+        if (leastUsedLinks.length === 0) {
+            availableLinks = [...userLinks];
+            linkUsageCount.forEach((_, key) => linkUsageCount.set(key, 0)); // 사용 횟수 초기화
+            return selectLink();
+        }
+
+        // 최소 사용된 링크들 중 하나 선택
+        availableLinks = shuffle([...leastUsedLinks]);
+        const selectedLink = availableLinks.shift();
+        linkUsageCount.set(selectedLink.displayText, linkUsageCount.get(selectedLink.displayText) + 1);
+        return selectedLink;
+    }
 
     class Symbol {
         constructor(x, y) {
@@ -59,20 +89,7 @@ function createMatrixEffect() {
             this.y = y;
             this.isLink = true; // 항상 링크 심볼
 
-            // 중복되지 않는 링크 선택
-            let linkData;
-            let attempts = 0;
-            const maxAttempts = 10; // 최대 시도 횟수
-            do {
-                linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
-                attempts++;
-                if (attempts >= maxAttempts) {
-                    // 너무 많은 시도 실패 시 사용 가능한 첫 링크 선택
-                    linkData = userLinks.find(link => !recentlyUsedLinks.has(link.displayText)) || userLinks[0];
-                    break;
-                }
-            } while (recentlyUsedLinks.has(linkData.displayText));
-
+            const linkData = selectLink();
             this.value = linkData.displayText;
             this.url = linkData.url;
             this.logo = logoImages[linkData.displayText];
@@ -84,12 +101,6 @@ function createMatrixEffect() {
             this.logoWidth = logoWidth;
             this.logoHeight = logoHeight;
             this.totalHeight = this.height + this.logoHeight + 5;
-
-            // 최근 사용된 링크에 추가
-            recentlyUsedLinks.add(this.value);
-            setTimeout(() => {
-                recentlyUsedLinks.delete(this.value);
-            }, cooldownTime);
         }
 
         draw() {
@@ -110,31 +121,13 @@ function createMatrixEffect() {
                 this.y = -this.totalHeight;
                 this.x = Math.random() * matrix.width;
 
-                // 중복되지 않는 새로운 링크 선택
-                let linkData;
-                let attempts = 0;
-                const maxAttempts = 10;
-                do {
-                    linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
-                    attempts++;
-                    if (attempts >= maxAttempts) {
-                        linkData = userLinks.find(link => !recentlyUsedLinks.has(link.displayText)) || userLinks[0];
-                        break;
-                    }
-                } while (recentlyUsedLinks.has(linkData.displayText));
-
+                const linkData = selectLink();
                 this.value = linkData.displayText;
                 this.url = linkData.url;
                 this.logo = logoImages[linkData.displayText];
                 this.width = ctx.measureText(this.value).width;
                 this.height = this.value.length * 16;
                 this.totalHeight = this.height + this.logoHeight + 5;
-
-                // 최근 사용된 링크에 추가
-                recentlyUsedLinks.add(this.value);
-                setTimeout(() => {
-                    recentlyUsedLinks.delete(this.value);
-                }, cooldownTime);
             }
         }
 
