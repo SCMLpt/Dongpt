@@ -7,8 +7,8 @@ function createMatrixEffect() {
     matrix.style.position = 'fixed';
     matrix.style.top = '0';
     matrix.style.left = '0';
-    matrix.style.zIndex = '0'; // z-index를 0으로 설정
-    matrix.style.pointerEvents = 'auto'; // 클릭 이벤트 활성화
+    matrix.style.zIndex = '0';
+    matrix.style.pointerEvents = 'auto';
     
     document.body.appendChild(matrix);
     const ctx = matrix.getContext('2d');
@@ -36,10 +36,11 @@ function createMatrixEffect() {
                 this.value = String.fromCharCode(65 + Math.random() * 57);
                 this.color = '#00FF00'; // 기본 심볼은 초록색
             }
-            this.speed = 1 + Math.random() * 5;
+            // 속도를 느리게 조정: 0.5 ~ 2 사이로 설정
+            this.speed = 0.5 + Math.random() * 1.5;
             ctx.font = '16px monospace';
             this.width = ctx.measureText(this.value).width;
-            this.height = 16; // 대략적인 텍스트 높이
+            this.height = 16;
         }
 
         draw() {
@@ -50,7 +51,7 @@ function createMatrixEffect() {
             if (this.y > matrix.height) {
                 this.y = -20;
                 this.x = Math.random() * matrix.width;
-                this.isLink = Math.random() < 0.1; // 10% 확률로 링크 심볼
+                this.isLink = Math.random() < 0.1;
                 if (this.isLink) {
                     const linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
                     this.value = linkData.displayText;
@@ -76,6 +77,16 @@ function createMatrixEffect() {
             }
             return isWithinBounds;
         }
+
+        // 호버 영역 확인
+        isHovered(mouseX, mouseY) {
+            return (
+                mouseX >= this.x &&
+                mouseX <= this.x + this.width &&
+                mouseY >= this.y - this.height &&
+                mouseY <= this.y
+            );
+        }
     }
 
     const symbols = [];
@@ -91,6 +102,7 @@ function createMatrixEffect() {
         requestAnimationFrame(animate);
     }
 
+    // 클릭 이벤트
     matrix.addEventListener('click', (event) => {
         const rect = matrix.getBoundingClientRect();
         const clickX = event.clientX - rect.left;
@@ -100,6 +112,42 @@ function createMatrixEffect() {
         symbols.forEach(symbol => {
             if (symbol.isLink && symbol.isClicked(clickX, clickY)) {
                 console.log(`Navigating to: ${symbol.url}`);
+                window.open(symbol.url, '_blank');
+            }
+        });
+    });
+
+    // 마우스 이동 이벤트 (호버 감지)
+    matrix.addEventListener('mousemove', (event) => {
+        const rect = matrix.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+
+        let isOverLink = false;
+        symbols.forEach(symbol => {
+            if (symbol.isLink && symbol.isHovered(mouseX, mouseY)) {
+                isOverLink = true;
+            }
+        });
+
+        // 링크 위에 있을 때 커서를 포인터로 변경
+        matrix.style.cursor = isOverLink ? 'pointer' : 'default';
+    });
+
+    // 마우스가 캔버스 밖으로 나가면 커서 초기화
+    matrix.addEventListener('mouseleave', () => {
+        matrix.style.cursor = 'default';
+    });
+
+    // 터치 이벤트 지원 (모바일)
+    matrix.addEventListener('touchstart', (event) => {
+        const rect = matrix.getBoundingClientRect();
+        const touch = event.touches[0];
+        const clickX = touch.clientX - rect.left;
+        const clickY = touch.clientY - rect.top;
+
+        symbols.forEach(symbol => {
+            if (symbol.isLink && symbol.isClicked(clickX, clickY)) {
                 window.open(symbol.url, '_blank');
             }
         });
