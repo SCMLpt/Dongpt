@@ -12,8 +12,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const buySection = document.getElementById('buySection');
     const founderSection = document.getElementById('founderSection');
     const statsSection = document.getElementById('statsSection');
+    const dongptExplorerSection = document.getElementById('dongptExplorerSection');
     const statsTitle = document.getElementById('statsTitle');
     const portfolioTableBody = document.querySelector('#portfolioTable tbody');
+    const dongptExplorerTableBody = document.querySelector('#dongptExplorerTable tbody');
     const menuLinks = document.querySelectorAll('.menu-link');
     const dropdownItems = document.querySelectorAll('.dropdown-item');
 
@@ -72,12 +74,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
+                dongptExplorerSection.classList.remove('active');
             } else if (section === 'portfolio') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.add('active');
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
+                dongptExplorerSection.classList.remove('active');
                 if (connectedAccount) {
                     fetchPortfolio();
                 } else {
@@ -89,25 +93,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                 buySection.classList.add('active');
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
+                dongptExplorerSection.classList.remove('active');
             } else if (section === 'founder') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
                 buySection.classList.remove('active');
                 founderSection.classList.add('active');
                 statsSection.classList.remove('active');
+                dongptExplorerSection.classList.remove('active');
             } else if (section === 'stats') {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
                 statsSection.classList.add('active');
-                statsTitle.textContent = 'Stats'; // 기본 제목
+                dongptExplorerSection.classList.remove('active');
+                statsTitle.textContent = 'Stats';
+            } else if (section === 'dongpt-explorer') {
+                swapSection.classList.remove('active');
+                portfolioSection.classList.remove('active');
+                buySection.classList.remove('active');
+                founderSection.classList.remove('active');
+                statsSection.classList.remove('active');
+                dongptExplorerSection.classList.add('active');
+                fetchDongptHolders();
             } else {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
+                dongptExplorerSection.classList.remove('active');
             }
         });
     });
@@ -123,33 +139,63 @@ document.addEventListener('DOMContentLoaded', async () => {
                 buySection.classList.remove('active');
                 founderSection.classList.remove('active');
                 statsSection.classList.add('active');
+                dongptExplorerSection.classList.remove('active');
                 statsTitle.textContent = item.textContent;
 
                 if (statsType === 'activity') {
                     fetchAndShowActivityChart();
                 } else {
-                    // 다른 Stats 항목에 대한 처리 (미래 확장 가능)
                     statsTitle.textContent = item.textContent;
                 }
             }
         });
     });
 
+    // Dongpt 홀더 정보를 가져오는 함수
+    async function fetchDongptHolders() {
+        dongptExplorerTableBody.innerHTML = ''; // 테이블 초기화
+
+        try {
+            // Algorand Indexer API를 사용하여 자산 정보 가져오기
+            const assetId = '2800093456'; // Dongpt 자산 ID
+            const response = await fetch(`https://algoindexer.algoexplorerapi.io/v2/assets/${assetId}/balances?limit=10`);
+            const data = await response.json();
+
+            if (!data.balances || data.balances.length === 0) {
+                dongptExplorerTableBody.innerHTML = '<tr><td colspan="2">No holders found.</td></tr>';
+                return;
+            }
+
+            // 홀더 정보를 테이블에 렌더링
+            data.balances.forEach(holder => {
+                const address = holder.address;
+                const balance = holder.amount; // Algorand의 경우 소수점 조정이 필요할 수 있음
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${address}</td>
+                    <td>${balance}</td>
+                `;
+                dongptExplorerTableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching Dongpt holders:', error);
+            dongptExplorerTableBody.innerHTML = '<tr><td colspan="2">Error fetching data.</td></tr>';
+        }
+    }
+
     // Activity 차트 데이터 가져오기 및 표시
     async function fetchAndShowActivityChart() {
         if (activityChart) {
-            activityChart.destroy(); // 기존 차트 제거
+            activityChart.destroy();
         }
 
-        // 실제 데이터 가져오기 (프록시 서버 또는 더미 데이터 사용)
         let data;
         try {
-            // 프록시 서버에서 데이터 가져오기 (실제 서버 URL로 교체 필요)
             const response = await fetch('http://localhost:3000/api/social-interactions');
             data = await response.json();
         } catch (error) {
             console.error('Error fetching social interactions:', error);
-            // 더미 데이터로 대체
             data = {
                 '2024-02-22': 5000,
                 '2024-02-23': 7500,
@@ -261,7 +307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     alert('MetaMask is not installed.');
                 }
             }
-            // 지갑 연결 후 포트폴리오가 열려있다면 업데이트
             if (portfolioSection.classList.contains('active')) {
                 fetchPortfolio();
             }
@@ -290,14 +335,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            // 네트워크 확인
             const network = await provider.getNetwork();
             if (network.chainId !== chainId) {
                 alert(`Please switch to ${chainId === 1 ? 'Ethereum MainNet' : 'Sepolia'} in your wallet.`);
                 return;
             }
 
-            // 토큰 주소 설정
             const fromAddress = (chainId === 1 && from === 'WETH') ? WETH_ADDRESS : (chainId === 11155111 && from === 'WETH') ? WETH_SEPOLIA : null;
             const toAddress = (chainId === 1 && to === 'DAI') ? DAI_ADDRESS : (chainId === 11155111 && to === 'DAI') ? DAI_SEPOLIA : null;
 
@@ -309,20 +352,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const signer = provider.getSigner();
             const routerContract = new ethers.Contract(UNISWAP_ROUTER_ADDRESS, UNISWAP_ROUTER_ABI, signer);
 
-            // 스왑 파라미터 설정
             const amountIn = ethers.utils.parseEther(swapAmount);
             const amountOutMin = 0;
             const path = [fromAddress, toAddress];
             const to = connectedAccount;
             const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 
-            // 토큰 승인
             const tokenContract = new ethers.Contract(fromAddress, ERC20_ABI, signer);
             const approveTx = await tokenContract.approve(UNISWAP_ROUTER_ADDRESS, amountIn);
             await approveTx.wait();
             console.log('Token approved for swap');
 
-            // 스왑 실행
             const swapTx = await routerContract.swapExactTokensForTokens(
                 amountIn,
                 amountOutMin,
@@ -344,7 +384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function fetchPortfolio() {
         if (!connectedAccount || !provider) return;
 
-        portfolioTableBody.innerHTML = ''; // 테이블 초기화
+        portfolioTableBody.innerHTML = '';
 
         const tokens = [
             { name: 'WETH', address: chainSelect.value === '1' ? WETH_ADDRESS : WETH_SEPOLIA },
