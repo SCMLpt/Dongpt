@@ -15,89 +15,82 @@ function createMatrixEffect() {
     ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
     ctx.fillRect(0, 0, matrix.width, matrix.height);
 
-    // 링크 데이터 (유명 플랫폼 추가)
+    // 링크 데이터 (유명 플랫폼과 각 로고 추가)
     const userLinks = [
-        { url: 'https://x.com/KamuiTranslator', displayText: 'KamuiTranslator' },
-        { url: 'https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456', displayText: 'Tinyman Swap' },
-        { url: 'https://www.google.com', displayText: 'Google' },
-        { url: 'https://www.tiktok.com', displayText: 'TikTok' },
-        { url: 'https://www.youtube.com', displayText: 'YouTube' },
-        { url: 'https://www.facebook.com', displayText: 'Facebook' },
-        { url: 'https://www.instagram.com', displayText: 'Instagram' },
-        { url: 'https://www.twitter.com', displayText: 'Twitter' },
-        { url: 'https://www.linkedin.com', displayText: 'LinkedIn' },
-        { url: 'https://www.reddit.com', displayText: 'Reddit' },
-        { url: 'https://www.wikipedia.org', displayText: 'Wikipedia' },
-        { url: 'https://www.amazon.com', displayText: 'Amazon' },
-        { url: 'https://www.netflix.com', displayText: 'Netflix' },
-        { url: 'https://www.spotify.com', displayText: 'Spotify' }
+        { url: 'https://x.com/KamuiTranslator', displayText: 'KamuiTranslator', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
+        { url: 'https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456', displayText: 'Tinyman Swap', logo: 'https://scmlpt.github.io/Dongpt/logo.png' },
+        { url: 'https://www.google.com', displayText: 'Google', logo: 'https://www.google.com/favicon.ico' },
+        { url: 'https://www.tiktok.com', displayText: 'TikTok', logo: 'https://www.tiktok.com/favicon.ico' },
+        { url: 'https://www.youtube.com', displayText: 'YouTube', logo: 'https://www.youtube.com/favicon.ico' },
+        { url: 'https://www.facebook.com', displayText: 'Facebook', logo: 'https://www.facebook.com/favicon.ico' },
+        { url: 'https://www.instagram.com', displayText: 'Instagram', logo: 'https://www.instagram.com/favicon.ico' },
+        { url: 'https://www.twitter.com', displayText: 'Twitter', logo: 'https://www.twitter.com/favicon.ico' },
+        { url: 'https://www.linkedin.com', displayText: 'LinkedIn', logo: 'https://www.linkedin.com/favicon.ico' },
+        { url: 'https://www.reddit.com', displayText: 'Reddit', logo: 'https://www.reddit.com/favicon.ico' },
+        { url: 'https://www.wikipedia.org', displayText: 'Wikipedia', logo: 'https://www.wikipedia.org/favicon.ico' },
+        { url: 'https://www.amazon.com', displayText: 'Amazon', logo: 'https://www.amazon.com/favicon.ico' },
+        { url: 'https://www.netflix.com', displayText: 'Netflix', logo: 'https://www.netflix.com/favicon.ico' },
+        { url: 'https://www.spotify.com', displayText: 'Spotify', logo: 'https://www.spotify.com/favicon.ico' }
     ];
 
-    // 로고 이미지 로드
-    const logoImage = new Image();
-    logoImage.src = 'https://scmlpt.github.io/Dongpt/logo.png';
+    // 각 링크에 대해 로고 이미지 캐싱
+    const logoImages = {};
+    userLinks.forEach(link => {
+        const img = new Image();
+        img.src = link.logo;
+        img.onerror = () => {
+            console.warn(`Failed to load logo for ${link.displayText}, using fallback.`);
+            img.src = 'https://scmlpt.github.io/Dongpt/logo.png'; // 로드 실패 시 대체 로고
+        };
+        logoImages[link.displayText] = img;
+    });
+
     const logoWidth = 30;
     const logoHeight = 30;
 
     class Symbol {
-        constructor(x, y, isLink = false) {
+        constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.isLink = isLink;
-            if (isLink) {
-                const linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
-                this.value = linkData.displayText;
-                this.url = linkData.url;
-                this.color = '#FFFF00'; // 링크는 노란색
-            } else {
-                this.value = String.fromCharCode(65 + Math.random() * 57);
-                this.color = '#00FF00'; // 기본 심볼은 초록색
-            }
+            this.isLink = true; // 항상 링크 심볼로 설정
+            const linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
+            this.value = linkData.displayText;
+            this.url = linkData.url;
+            this.logo = logoImages[linkData.displayText];
+            this.color = '#00FF00'; // 모든 심볼을 초록색으로 통일
             this.speed = 0.5 + Math.random() * 1.5;
             ctx.font = '16px monospace';
             this.width = ctx.measureText(this.value).width;
-            this.height = this.isLink ? this.value.length * 16 : 16;
+            this.height = this.value.length * 16;
             this.logoWidth = logoWidth;
             this.logoHeight = logoHeight;
-            this.totalHeight = this.isLink ? this.height + this.logoHeight + 5 : this.height;
+            this.totalHeight = this.height + this.logoHeight + 5;
         }
 
         draw() {
-            if (this.isLink) {
-                ctx.fillStyle = this.color;
-                ctx.font = '16px monospace';
-                for (let i = 0; i < this.value.length; i++) {
-                    const charY = this.y + i * 16;
-                    ctx.fillText(this.value[i], this.x, charY);
-                }
+            ctx.fillStyle = this.color;
+            ctx.font = '16px monospace';
+            for (let i = 0; i < this.value.length; i++) {
+                const charY = this.y + i * 16;
+                ctx.fillText(this.value[i], this.x, charY);
+            }
 
-                if (logoImage.complete) {
-                    const logoY = this.y + this.value.length * 16 + 5;
-                    ctx.drawImage(logoImage, this.x, logoY, this.logoWidth, this.logoHeight);
-                }
-            } else {
-                ctx.fillStyle = this.color;
-                ctx.font = '16px monospace';
-                ctx.fillText(this.value, this.x, this.y);
+            if (this.logo && this.logo.complete) {
+                const logoY = this.y + this.value.length * 16 + 5;
+                ctx.drawImage(this.logo, this.x, logoY, this.logoWidth, this.logoHeight);
             }
 
             this.y += this.speed;
             if (this.y >= matrix.height) {
                 this.y = -this.totalHeight;
                 this.x = Math.random() * matrix.width;
-                this.isLink = Math.random() < 0.1;
-                if (this.isLink) {
-                    const linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
-                    this.value = linkData.displayText;
-                    this.url = linkData.url;
-                    this.color = '#FFFF00';
-                } else {
-                    this.value = String.fromCharCode(65 + Math.random() * 57);
-                    this.color = '#00FF00';
-                }
+                const linkData = userLinks[Math.floor(Math.random() * userLinks.length)];
+                this.value = linkData.displayText;
+                this.url = linkData.url;
+                this.logo = logoImages[linkData.displayText];
                 this.width = ctx.measureText(this.value).width;
-                this.height = this.isLink ? this.value.length * 16 : 16;
-                this.totalHeight = this.isLink ? this.height + this.logoHeight + 5 : this.height;
+                this.height = this.value.length * 16;
+                this.totalHeight = this.height + this.logoHeight + 5;
             }
         }
 
@@ -108,7 +101,7 @@ function createMatrixEffect() {
                 clickY >= this.y &&
                 clickY <= this.y + this.totalHeight
             );
-            if (isWithinBounds && this.isLink) {
+            if (isWithinBounds) {
                 console.log(`Clicked on link: ${this.value} at (${this.x}, ${this.y})`);
             }
             return isWithinBounds;
@@ -126,8 +119,7 @@ function createMatrixEffect() {
 
     const symbols = [];
     for (let i = 0; i < 100; i++) {
-        const isLink = Math.random() < 0.1;
-        symbols.push(new Symbol(Math.random() * matrix.width, Math.random() * matrix.height, isLink));
+        symbols.push(new Symbol(Math.random() * matrix.width, Math.random() * matrix.height));
     }
 
     function animate() {
@@ -144,7 +136,7 @@ function createMatrixEffect() {
         console.log(`Click at (${clickX}, ${clickY})`);
 
         symbols.forEach(symbol => {
-            if (symbol.isLink && symbol.isClicked(clickX, clickY)) {
+            if (symbol.isClicked(clickX, clickY)) {
                 console.log(`Navigating to: ${symbol.url}`);
                 window.open(symbol.url, '_blank');
             }
@@ -158,7 +150,7 @@ function createMatrixEffect() {
 
         let isOverLink = false;
         symbols.forEach(symbol => {
-            if (symbol.isLink && symbol.isHovered(mouseX, mouseY)) {
+            if (symbol.isHovered(mouseX, mouseY)) {
                 isOverLink = true;
             }
         });
@@ -177,7 +169,7 @@ function createMatrixEffect() {
         const clickY = touch.clientY - rect.top;
 
         symbols.forEach(symbol => {
-            if (symbol.isLink && symbol.isClicked(clickX, clickY)) {
+            if (symbol.isClicked(clickX, clickY)) {
                 window.open(symbol.url, '_blank');
             }
         });
