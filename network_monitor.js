@@ -22,7 +22,8 @@
             statusCode: null,
             duration: null,
             timestamp: new Date().toLocaleTimeString(),
-            target: new URL(args[0]).hostname // 요청을 받는 서버 이름
+            target: new URL(args[0]).hostname, // 요청을 받는 서버 이름
+            requestName: new URL(args[0]).pathname.includes('balances') ? 'GET Asset Balances' : 'GET Asset Info'
         };
 
         // 요청 로그 추가
@@ -76,7 +77,7 @@
         }
     }
 
-    // 네트워크 요청 렌더링
+    // 네트워크 요청 렌더링 (간소화된 로그)
     function renderNetworkRequests() {
         networkRequests.innerHTML = '';
 
@@ -87,17 +88,12 @@
             if (log.action) {
                 // 사용자 액션 로그
                 requestDiv.innerHTML = `
-                    <p>[${log.timestamp}] Action: ${log.action}</p>
+                    <p>[${log.timestamp}] ${log.action}</p>
                 `;
             } else {
-                // 네트워크 요청 로그
-                const statusColor = log.status === 'Success' ? '#00FF00' : log.status === 'Failed' ? '#FF0000' : '#FFFF00';
+                // 네트워크 요청 로그 (간소화)
                 requestDiv.innerHTML = `
-                    <p>[${log.timestamp}] Request: ${log.method} ${log.url}</p>
-                    <p>Target: ${log.target}</p>
-                    <p>Status: <span style="color: ${statusColor}">${log.status} (${log.statusCode || 'Pending'})</span></p>
-                    <p>Duration: ${log.duration ? log.duration + 'ms' : 'Pending'}</p>
-                    <p>Flow: Client -> ${log.target}</p>
+                    <p>[${log.timestamp}] ${log.requestName}</p>
                 `;
             }
 
@@ -109,7 +105,7 @@
         drawNetworkFlow(latestRequest);
     }
 
-    // 네트워크 흐름 시각화
+    // 네트워크 흐름 시각화 (화살표 개선)
     function drawNetworkFlow(request) {
         ctx.clearRect(0, 0, networkFlowCanvas.width, networkFlowCanvas.height);
 
@@ -210,6 +206,14 @@
             ctx.lineTo(135, 80);
             ctx.fillStyle = '#00FF00';
             ctx.fill();
+
+            // 더미 데이터 흐름 정보
+            ctx.fillStyle = '#00FF00';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Target: Local', 100, 55);
+            ctx.fillText('Status: Success', 100, 65);
+            ctx.fillText('Duration: 0ms', 100, 75);
         } else {
             // 화살표 머리
             ctx.beginPath();
@@ -218,6 +222,14 @@
             ctx.lineTo(135, 35);
             ctx.fillStyle = '#00FF00';
             ctx.fill();
+
+            // 화살표 주변에 정보 표시
+            ctx.fillStyle = '#00FF00';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Target: ${request.target}`, 100, 10);
+            ctx.fillText(`Status: ${request.status} (${request.statusCode})`, 100, 40);
+            ctx.fillText(`Duration: ${request.duration}ms`, 100, 50);
         }
     }
 
