@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dongptExplorerSection = document.getElementById('dongptExplorerSection');
     const statsTitle = document.getElementById('statsTitle');
     const portfolioTableBody = document.querySelector('#portfolioTable tbody');
-    const dongptExplorerTableBody = document.querySelector('#dongptExplorerTable tbody');
     const menuLinks = document.querySelectorAll('.menu-link');
     const dropdownItems = document.querySelectorAll('.dropdown-item');
 
@@ -116,7 +115,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 founderSection.classList.remove('active');
                 statsSection.classList.remove('active');
                 dongptExplorerSection.classList.add('active');
-                fetchDongptHolders();
+                // dongpt_holder.js에서 이미 데이터를 로드했으므로 필요 시 새로고침 가능
+                if (window.fetchDongptHolders) {
+                    window.fetchDongptHolders();
+                }
             } else {
                 swapSection.classList.remove('active');
                 portfolioSection.classList.remove('active');
@@ -150,39 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     });
-
-    // Dongpt 홀더 정보를 가져오는 함수
-    async function fetchDongptHolders() {
-        dongptExplorerTableBody.innerHTML = ''; // 테이블 초기화
-
-        try {
-            // Algorand Indexer API를 사용하여 자산 정보 가져오기
-            const assetId = '2800093456'; // Dongpt 자산 ID
-            const response = await fetch(`https://algoindexer.algoexplorerapi.io/v2/assets/${assetId}/balances?limit=10`);
-            const data = await response.json();
-
-            if (!data.balances || data.balances.length === 0) {
-                dongptExplorerTableBody.innerHTML = '<tr><td colspan="2">No holders found.</td></tr>';
-                return;
-            }
-
-            // 홀더 정보를 테이블에 렌더링
-            data.balances.forEach(holder => {
-                const address = holder.address;
-                const balance = holder.amount; // Algorand의 경우 소수점 조정이 필요할 수 있음
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${address}</td>
-                    <td>${balance}</td>
-                `;
-                dongptExplorerTableBody.appendChild(row);
-            });
-        } catch (error) {
-            console.error('Error fetching Dongpt holders:', error);
-            dongptExplorerTableBody.innerHTML = '<tr><td colspan="2">Error fetching data.</td></tr>';
-        }
-    }
 
     // Activity 차트 데이터 가져오기 및 표시
     async function fetchAndShowActivityChart() {
