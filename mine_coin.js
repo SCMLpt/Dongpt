@@ -13,16 +13,25 @@ function initNetworkSharing() {
     if (sharedData) {
         try {
             sharedActions = JSON.parse(decodeURIComponent(atob(sharedData))).actions || [];
+            console.log('Shared actions loaded:', sharedActions);
         } catch (e) {
             console.error('Invalid shared data:', e);
         }
     }
 
     function updateNetworkDisplay() {
-        document.getElementById('totalMined').textContent = networkData.totalContributions.toFixed(2);
-        document.getElementById('miningAttempts').textContent = networkData.actions.length;
-
+        const totalMinedElement = document.getElementById('totalMined');
+        const miningAttemptsElement = document.getElementById('miningAttempts');
         const historyBody = document.getElementById('miningHistoryBody');
+
+        if (!totalMinedElement || !miningAttemptsElement || !historyBody) {
+            console.error('Required elements not found for updateNetworkDisplay');
+            return;
+        }
+
+        totalMinedElement.textContent = networkData.totalContributions.toFixed(2);
+        miningAttemptsElement.textContent = networkData.actions.length;
+
         historyBody.innerHTML = '';
 
         // 내 기록 표시
@@ -69,24 +78,52 @@ function initNetworkSharing() {
         localStorage.setItem('networkData', JSON.stringify(networkData));
         updateNetworkDisplay();
 
-        window.logAction(`Contribution: ${contributionValue.toFixed(2)} units (${timeTaken}ms)`);
+        if (window.logAction) {
+            window.logAction(`Contribution: ${contributionValue.toFixed(2)} units (${timeTaken}ms)`);
+        } else {
+            console.warn('window.logAction is not defined');
+        }
     }
 
+    // 버튼 설정
+    const contributeButton = document.getElementById('mineButton');
+    if (!contributeButton) {
+        console.error('Contribute button not found');
+        return;
+    }
+    contributeButton.textContent = 'Contribute to Network';
+    contributeButton.addEventListener('click', contributeToNetwork);
+
     // 공유 링크 생성 버튼 추가
-    const shareButton = document.createElement('button');
-    shareButton.textContent = 'Share My Contributions';
+    const mineCoinsSection = document.getElementById('mineCoinsSection');
+    if (!mineCoinsSection) {
+        console.error('mineCoinsSection not found');
+        return;
+    }
+
+    let shareButton = document.getElementById('shareButton');
+    if (!shareButton) {
+        shareButton = document.createElement('button');
+        shareButton.id = 'shareButton';
+        shareButton.textContent = 'Share My Contributions';
+        mineCoinsSection.appendChild(shareButton);
+        console.log('Share button created and appended');
+    } else {
+        console.log('Share button already exists');
+    }
+
     shareButton.addEventListener('click', () => {
         const jsonData = JSON.stringify(networkData);
         const encodedData = btoa(encodeURIComponent(jsonData));
         const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
-        navigator.clipboard.writeText(shareUrl);
-        alert('Share URL copied to clipboard!');
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('Share URL copied to clipboard!');
+            console.log('Share URL:', shareUrl);
+        }).catch(err => {
+            console.error('Failed to copy URL:', err);
+            alert('Failed to copy URL. Please copy it manually: ' + shareUrl);
+        });
     });
-    document.getElementById('mineCoinsSection').appendChild(shareButton);
-
-    const contributeButton = document.getElementById('mineButton');
-    contributeButton.textContent = 'Contribute to Network';
-    contributeButton.addEventListener('click', contributeToNetwork);
 
     updateNetworkDisplay();
 
@@ -94,4 +131,7 @@ function initNetworkSharing() {
     window.contributeToNetwork = contributeToNetwork;
 }
 
-window.addEventListener('load', initNetworkSharing);
+window.addEventListener('load', () => {
+    console.log('mine_coins.js loaded');
+    initNetworkSharing();
+});
