@@ -2,12 +2,20 @@ function createMatrixEffect() {
     const matrix = document.createElement('canvas');
     matrix.width = window.innerWidth;
     matrix.height = window.innerHeight;
+    
+    // 캔버스 스타일 설정
+    matrix.style.position = 'fixed';
+    matrix.style.top = '0';
+    matrix.style.left = '0';
+    matrix.style.zIndex = '0'; // z-index를 0으로 설정
+    matrix.style.pointerEvents = 'auto'; // 클릭 이벤트 활성화
+    
     document.body.appendChild(matrix);
     const ctx = matrix.getContext('2d');
     ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
     ctx.fillRect(0, 0, matrix.width, matrix.height);
 
-    // 링크 데이터 (사용자 링크 목록)
+    // 링크 데이터
     const userLinks = [
         { url: 'https://x.com/KamuiTranslator', displayText: 'KamuiTranslator' },
         { url: 'https://app.tinyman.org/swap?asset_in=0&asset_out=2800093456', displayText: 'Tinyman Swap' },
@@ -29,6 +37,7 @@ function createMatrixEffect() {
                 this.color = '#00FF00'; // 기본 심볼은 초록색
             }
             this.speed = 1 + Math.random() * 5;
+            ctx.font = '16px monospace';
             this.width = ctx.measureText(this.value).width;
             this.height = 16; // 대략적인 텍스트 높이
         }
@@ -56,12 +65,16 @@ function createMatrixEffect() {
         }
 
         isClicked(clickX, clickY) {
-            return (
+            const isWithinBounds = (
                 clickX >= this.x &&
                 clickX <= this.x + this.width &&
                 clickY >= this.y - this.height &&
                 clickY <= this.y
             );
+            if (isWithinBounds && this.isLink) {
+                console.log(`Clicked on link: ${this.value} at (${this.x}, ${this.y})`);
+            }
+            return isWithinBounds;
         }
     }
 
@@ -82,9 +95,11 @@ function createMatrixEffect() {
         const rect = matrix.getBoundingClientRect();
         const clickX = event.clientX - rect.left;
         const clickY = event.clientY - rect.top;
+        console.log(`Click at (${clickX}, ${clickY})`);
 
         symbols.forEach(symbol => {
             if (symbol.isLink && symbol.isClicked(clickX, clickY)) {
+                console.log(`Navigating to: ${symbol.url}`);
                 window.open(symbol.url, '_blank');
             }
         });
